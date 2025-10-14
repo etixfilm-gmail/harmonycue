@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>There has been an error</title>
+		<link
+			href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+			rel="stylesheet"
+			id="bootstrap-css"
+		/>
+		<link rel="stylesheet" href="/hc-static-css/hc-static-css-error.css" />
+	</head>
+	<body>
+		<div id="main">
+			<div style="display: none">source file: hc-views-error.ejs</div>
+			<div class="flex-container">
+				<div id="status"><%=status%></div>
+				<div id="description">
+					To err is human; to really mess up you need a computer.<br /><%=message%>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

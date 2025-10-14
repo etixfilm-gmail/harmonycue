@@ -1,0 +1,345 @@
+/* hc-static-css-multimixer.css gets loaded by 
+/* hc-static-css/hc-static-css-styles.css
+/* as @import url("hc-static-css-multimixer.css") */
+
+.mxr-player {
+	width: var(--section-width);
+	padding-left: calc(var(--section-width) * 0.01);
+	margin: 0 auto;
+	user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+.mxr-player-border {
+	position: relative;
+	border: solid #744886;
+	border-radius: calc(var(--section-width) * 0.008);
+	border-width: calc(var(--section-width) * 0.003);
+}
+
+.mxr-track {
+	/* border: solid blue; */
+	position: relative; /* ✨ Required so the overlay can be contained */
+	display: flex;
+	align-items: center;
+	gap: calc(var(--section-width) * 0.02);
+	background: transparent;
+	height: var(--track-height);
+	padding: 0;
+	/* REMOVED: pointer-events: none; - tracks need to respond to events */
+}
+
+#mxr-track-list {
+	display: none;
+}
+
+.mxr-dim-overlay {
+	/* border: solid red; */
+	position: absolute;
+	inset: 0;
+	right: var(--btn-size);
+	background-color: rgba(0, 0, 0, 0.45);
+	pointer-events: none; /* Keep this - overlay should not block events */
+	border-radius: inherit;
+	display: none;
+}
+
+.mxr-track.muted .mxr-dim-overlay {
+	display: block;
+}
+
+/* 📦 Timeline container with label below */
+.mxr-timeline-container {
+	position: relative; /* required for absolute children */
+	display: flex;
+	align-items: center; /* center progress bar vertically */
+	flex: 1 1 auto;
+	/* REMOVED: pointer-events: none; - timeline needs to respond to clicks/drags */
+}
+
+.mxr-timeline {
+	/* border: solid green; */
+	background-color: #460c61;
+	width: 100%;
+	height: calc(var(--section-width) * 0.00625);
+	/* REMOVED: pointer-events: none; - timeline needs to respond to events */
+}
+
+.mxr-track-label {
+	/* border: solid lime; */
+	position: absolute;
+	bottom: calc(var(--track-height) * -0.6); /* adjust spacing here */
+	left: 0;
+	width: 100%;
+	text-align: left;
+	color: #fff8e8;
+	pointer-events: none; /* Keep this - labels should not interfere with drag */
+}
+
+progress::-webkit-mixer-progress-bar {
+	background: #744886;
+}
+
+progress::-webkit-mixer-progress-value {
+	background: #fff8e8;
+}
+
+.mxr-timeline-slider {
+	opacity: 0;
+	position: absolute;
+	z-index: 5;
+	transform: translateX(-1px);
+	width: 1px;
+	background-color: dodgerblue;
+	box-shadow: 0px 0px 8px 1px dodgerblue;
+	pointer-events: auto; /* Keep this - slider needs to be draggable */
+
+	top: 0; /* Full vertical height of mixer player */
+	bottom: 0;
+}
+
+.mxr-timeline-slider.on {
+	opacity: 1;
+}
+
+.mxr-dial-container {
+	flex: 0 0 calc(var(--dial-size)); /* Adjust dial size proportionally */
+	height: auto;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* ADDED: Enable pointer events for dial container */
+	pointer-events: auto;
+}
+
+.mxr-dial {
+	width: calc(var(--dial-size));
+	height: calc(var(--dial-size));
+	background: url("/hc-static-images/hc-static-images-pan-dial.webp") no-repeat
+		center center;
+	background-size: calc(var(--dial-size));
+	position: relative;
+	/* ADDED: Enable pointer events for dial */
+	pointer-events: auto;
+}
+
+.mxr-dial.dial-disabled {
+	pointer-events: none; /* Keep this - disabled dials should not respond */
+}
+
+.mxr-dial-label {
+	font-weight: 150;
+	position: absolute;
+	bottom: calc(var(--dial-size) * -0.2);
+	font-size: calc(var(--dial-size) * 0.35);
+	pointer-events: none; /* Keep this - labels should not interfere */
+}
+
+.mxr-left-label {
+	left: calc(var(--dial-size) * -0.01);
+}
+
+.mxr-right-label {
+	right: calc(var(--dial-size) * -0.1);
+}
+
+.mxr-indicator {
+	position: absolute;
+	width: calc(var(--dial-size) * 0.1);
+	height: calc(var(--dial-size) * 0.25);
+	background: rgb(215, 0, 0);
+	border-radius: calc(var(--dial-size) * 0.05);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -150%) rotate(0deg);
+	transform-origin: 50% 150%;
+	pointer-events: none; /* Keep this - indicator should not interfere */
+}
+
+.mxr-volume-slider {
+	appearance: none;
+	flex: 0 0 calc(var(--slider-height) * 8); /* Let slider adjust within container */
+	height: var(--slider-height);
+	background: linear-gradient(to right, #460c61, #a384ab);
+	border-radius: calc(var(--section-width) * 0.02);
+	/* ADDED: Enable pointer events for volume slider */
+	pointer-events: auto;
+}
+
+.mxr-volume-slider::-webkit-slider-thumb {
+	appearance: none;
+	width: var(--slider-height);
+	height: var(--slider-height);
+	background: #fff8e8;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.mxr-control-btn {
+	width: var(--btn-size);
+	height: var(--btn-size);
+	align-items: center;
+	justify-content: center;
+	background: url("/hc-static-images/hc-static-images-btn-off.webp") no-repeat
+		center center;
+	background-size: cover;
+	border: none;
+	border-radius: calc(var(--btn-size) * 0.15);
+	cursor: pointer;
+	/* ADDED: Enable pointer events for control buttons */
+	pointer-events: auto;
+}
+
+.mxr-control-btn-icon {
+	width: calc(var(--btn-size) * 0.5);
+	height: calc(var(--btn-size) * 0.5);
+	object-fit: contain;
+	pointer-events: none; /* Keep this - icons should not interfere */
+}
+
+.mxr-download-icon {
+	width: calc(var(--btn-size) * 0.6);
+	height: calc(var(--btn-size) * 0.6);
+	object-fit: contain;
+	pointer-events: none; /* Keep this - icons should not interfere */
+}
+
+.mxr-control-btn.mute {
+	background: url("/hc-static-images/hc-static-images-btn-red.webp") no-repeat
+		center center;
+}
+
+.mxr-control-btn.inop {
+	pointer-events: none; /* Keep this - inactive buttons should not respond */
+	cursor: default;
+}
+
+#mxr-rewind-btn.btn-on {
+	background: url("/hc-static-images/hc-static-images-btn-blue.webp") no-repeat
+		center center;
+}
+
+#mxr-play-btn.btn-on {
+	background: url("/hc-static-images/hc-static-images-btn-green.webp") no-repeat
+		center center;
+}
+
+#mxr-pause-btn.btn-on {
+	background: url("/hc-static-images/hc-static-images-btn-yellow.webp")
+		no-repeat center center;
+}
+
+#mxr-download-btn.btn-on {
+	background: url("/hc-static-images/hc-static-images-btn-blue.webp") no-repeat
+		center center;
+}
+
+.mxr-mute-icon {
+	width: calc(var(--btn-size) * 0.6);
+	height: calc(var(--btn-size) * 0.6);
+	position: relative;
+	left: calc(var(--btn-size) * 0.1);
+	pointer-events: none; /* Keep this - icons should not interfere */
+}
+
+/* 🎛️ Preset Buttons and Voice Radios */
+.mxr-presets {
+	width: var(--section-width);
+	margin: 0 auto;
+	padding-bottom: calc(var(--btn-size) / 3);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: calc(var(--btn-size) / 6);
+}
+
+.mxr-preset-btn {
+	width: max(calc(var(--section-width) / 4), 135px);
+	height: var(--btn-size);
+	background: url("/hc-static-images/hc-static-images-wide-btn-off.webp")
+		no-repeat center center;
+	background-size: cover;
+	border: none;
+	color: #fff8e8;
+	border-radius: calc(var(--btn-size) / 8);
+	cursor: pointer;
+	/* ADDED: Ensure preset buttons respond to events */
+	pointer-events: auto;
+}
+
+.mxr-preset-btn:hover {
+	filter: brightness(1.15);
+}
+
+.mxr-preset-btn.btn-on {
+	background-image: url("/hc-static-images/hc-static-images-wide-btn-purple.webp");
+}
+
+.mxr-voice-selection {
+	display: flex;
+	gap: calc(var(--section-width) * 0.01);
+	align-items: center;
+}
+
+/* 🔥 Custom radio button using background images */
+.mxr-radio {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	margin: 0 calc(var(--section-width) * 0.01);
+	/* ADDED: Ensure radio buttons respond to events */
+	pointer-events: auto;
+}
+
+.mxr-radio input[type="radio"] {
+	display: none;
+}
+
+.mxr-radio input[type="radio"]:disabled + .custom-radio {
+	cursor: not-allowed;
+}
+
+.mxr-voice-letter {
+	/* border: solid green; */
+	position: relative;
+	top: calc(var(--btn-size) * 0.04);
+	padding-right: calc(var(--section-width) * 0.0045);
+	pointer-events: none; /* Keep this - text should not interfere */
+}
+
+.mxr-custom-radio {
+	width: calc(var(--btn-size) * 0.3);
+	height: calc(var(--btn-size) * 0.3);
+	background-image: url("/hc-static-images/hc-static-images-radio-off.webp");
+	background-size: cover;
+	background-position: center;
+	display: inline-block;
+	/* transition: background-image 0.3s; */
+	/* ADDED: Ensure custom radio responds to events */
+	pointer-events: auto;
+}
+
+/* When selected: change background image */
+.mxr-radio input[type="radio"]:checked + .mxr-custom-radio {
+	background-image: url("/hc-static-images/hc-static-images-radio-green.webp");
+}
+
+.mxr-radio input[type="radio"]:disabled + .mxr-custom-radio {
+	cursor: not-allowed;
+	pointer-events: none; /* Disabled radios should not respond */
+}
+
+/* Playback Buttons Under Mixer */
+#mxr-btns {
+	width: var(--section-width);
+	margin: calc(var(--btn-size) / 8) auto 0 auto;
+	padding-top: calc(var(--btn-size) / 8);
+	display: flex;
+	justify-content: center;
+	gap: calc(var(--btn-size) / 8);
+}

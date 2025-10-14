@@ -1,0 +1,42 @@
+{
+	"samplerList": [
+		{
+			"line-type": "heading-text-only",
+			"contents": ["Choral Tracks"]
+		},
+		{
+			"line-type": "sampler-items",
+			"contents": [
+				{
+					"description": "Banquet Fugue (SATB), from the operetta \"The Reluctant Dragon\" (excerpt), John Rutter",
+					"source": "Banquet Fugue - Amin 07 Full Mix Excerpt.mp3"
+				},
+				{
+					"description": "Boogie Woogie Bugle Boy (SSA), slow-speed learning track, Don Raye and Hughie Prince | mid-voice left channel",
+					"source": "BoogieWoogie_SLOW_MID_Left.mp3"
+				}
+			]
+		},
+		{
+			"line-type": "heading-text-only",
+			"contents": ["A Capella & Barbershop Tracks"]
+		},
+		{
+			"line-type": "sampler-items",
+			"contents": [
+				{
+					"description": "Irish Blessing (TTBB), Traditional, J. Jerome Williams and Don Gray",
+					"source": "Irish Blessing (all parts) Excerpt.mp3"
+				},
+				{
+					"description": "A Son of the Sea (TTBB), Traditional",
+					"source": "A Son of the Sea (all parts) Excerpt.mp3"
+				},
+				{
+					"description": "I'll Fly Away (TTBB), Albert E. Brumley",
+					"source": "I'll Fly Away (all parts) Excerpt.mp3"
+				}
+			]
+		}
+	]
+}

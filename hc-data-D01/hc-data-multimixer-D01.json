@@ -1,0 +1,78 @@
+{
+	"songname": "Gloria",
+	"mixtracks": [
+		{
+			"src": "Gloria Soprano.mp3",
+			"descr": {
+				"type": "voice",
+				"name": "Soprano",
+				"btnletter": "S",
+				"presets": "default"
+			}
+		},
+
+		{
+			"src": "Gloria Alto.mp3",
+			"descr": {
+				"type": "voice",
+				"name": "Alto",
+				"btnletter": "A",
+				"presets": "default"
+			}
+		},
+		{
+			"src": "Gloria Tenor.mp3",
+			"descr": {
+				"type": "voice",
+				"name": "Tenor",
+				"btnletter": "T",
+				"presets": "default"
+			}
+		},
+		{
+			"src": "Gloria Bass.mp3",
+			"descr": {
+				"type": "voice",
+				"name": "Bass",
+				"btnletter": "B",
+				"presets": "default"
+			}
+		},
+		{
+			"src": "Gloria Orch.mp3",
+			"descr": {
+				"type": "instr",
+				"name": "Orchestra Accomp.",
+				"presets": {
+					"init": { "angle": 0, "pan": 0, "gain": 0.5, "mute": false },
+					"stereo": { "angle": 0, "pan": 0, "gain": 0.5, "mute": false },
+					"partpre": { "angle": 0, "pan": 0, "gain": 0.3, "mute": false }
+				}
+			}
+		},
+		{
+			"src": "Gloria Piano.mp3",
+			"descr": {
+				"type": "instr",
+				"name": "Piano Accomp.",
+				"presets": {
+					"init": { "angle": 0, "pan": 0, "gain": 0.5, "mute": false },
+					"stereo": { "angle": 0, "pan": 0, "gain": 0.5, "mute": true },
+					"partpre": { "angle": 0, "pan": 0, "gain": 0.5, "mute": true }
+				}
+			}
+		},
+		{
+			"src": "Gloria Click.mp3",
+			"descr": {
+				"type": "tech",
+				"name": "Click Track",
+				"presets": {
+					"init": { "angle": 0, "pan": 0, "gain": 0.5, "mute": false },
+					"stereo": { "angle": 0, "pan": 0, "gain": 0.5, "mute": true },
+					"partpre": { "angle": 0, "pan": 0, "gain": 0.5, "mute": true }
+				}
+			}
+		}
+	]
+}

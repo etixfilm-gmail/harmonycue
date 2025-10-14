@@ -1,0 +1,45 @@
+<%- // c•onsole.log("hc-views/pages/intro.ejs") %>
+<!-- intro.ejs gets loaded by hc-views/layout/index.ejs -->
+<!-- as < %- include(`../pages/${sectionName}`, locals) % > -->
+<!-- where sectionName = "intro"  -->
+
+<section id="intro-dark-bar" class="dark-bar">
+	<div style="display: none">source file: hc-views-pages-intro.ejs</div>
+	<div id="intro-container" class="py-5 section-container">
+
+     <!-- < % for(let i = 100; i < 501; i+=10) { %> -->
+		<% // c•onsole.log(`.font-${i} {`) %>
+		<% // c•onsole.log(`font-size: calc(var(--section-width) * ${.01 + i * 0.005});`) %>
+		<% // c•onsole.log(`}`) %>
+		<% // c•onsole.log(`}`) %>
+		<% // thestyle = `font-weight:${i};` %>
+       <!-- <div style=< %= thestyle %>>  -->
+	   <!-- Font weight < %= i %>: Lorem ipsum -->
+		<!-- </div>  -->
+     <!-- < % } %> -->
+
+		<div id="intro-flex-row" class="d-flex gap-5">
+			<div id="intro-image-container">
+				<img
+					id="intro-image"
+					src="/hc-static-images/hc-static-images-FunnyChoir-temp.webp"
+					alt="Funny Choir"
+				/>
+			</div>
+			<div id="intro-text-col" class="text-left font-18 font-light">
+				<div id="intro-text-header-1" class="headline2">
+					Rehearse the way you want!
+				</div>
+				<div id="intro-text-1" class="font-4 font-light">
+					We provide fast custom made rehearsal tracks for every voice for any
+					choral music you can imagine. Send us the sheet music, and we create
+					bespoke audio tracks for each voice in the composition. Each voice can
+					practice listening to their part on its own, then sing along with the
+					digital choir to see how far they’ve come. Need a key change? Need new
+					lyrics? Changes are easy and have a quick turnaround. Nail the part
+					with HarmonyCue!
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

@@ -1,0 +1,51 @@
+@font-face {
+	font-family: "LeagueSpartan";
+	/* src: url("/static/fonts/LeagueSpartan-Regular.woff2") format("woff2"); */
+	src: url("../static-fonts/LeagueSpartan-VariableFont_wght.ttf")
+		format("truetype");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+#main {
+	font-family: "LeagueSpartan", sans-serif !important;
+	height: 100vh;
+	color: #460c61 !important;
+	background-color: #fffbf4;
+	width: 100vw;
+	position: relative;
+}
+
+#status {
+	font-weight: 600;
+	font-size: 5vw;
+	text-align: right;
+}
+
+#description {
+	border-left: 1px solid gray;
+	font-size: 2.25vw;
+	font-weight: 200;
+}
+
+.flex-container {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border: 2px solid #744886;
+	border-radius: 1.5vw;
+	width: 80vw;
+}
+
+.flex-container > div {
+	margin: 0px;
+	padding: 10px;
+}

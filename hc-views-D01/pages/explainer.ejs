@@ -1,0 +1,54 @@
+<%- // c•onsole.log("hc-views/pages/explainer.ejs") %>
+<!-- explainer.ejs gets loaded by hc-views/layout/index.ejs -->
+<!-- as < %- include(`../pages/${sectionName}`, locals) % > -->
+<!-- where sectionName = "multimixer"  -->
+
+<section
+	id="expl-light-bar"
+	class="light-bar"
+	style="background-position: center bottom"
+>
+	<div style="display: none">source file: hc-views/pages/explainer.ejs</div>
+
+	<div id="expl-container" class="section-container py-5">
+		<div id="expl-flex-row" class="d-flex gap-5">
+			<div id="expl-text-col" class="text-left">
+				<div id="expl-text-header-1" class="font-8 font-light">
+					How Does It Work?
+				</div>
+				<div id="expl-text-1" class="font-5 font-light">
+					Experience the HarmonyCue difference. When you get your rehearsal
+					track from us, you'll have a unique advantage in your hands, or
+					rather, ears. <em>In one ear,</em> you hear your part, but
+					<em>in the other,</em> you hear the rest of the choir. Lift one earbud
+					out and work on your part, or see how far you've come, put the other
+					bud back in, and to listen to the full song. Or, if you learn better
+					in a group setting, we offer rehearsal tracks with your part boosted
+					for extra clarity. Test it out on the picture to the right. In one ear
+					you'll hear only the LEAD part, in the other, all the rest of the
+					parts!
+				</div>
+				<p
+					id="enable-audio-prompt"
+					class="text1 player-border px-0 horiz-center vert-center font-3 font-med"
+				>
+					🎶 Tap to Enable Audio 🎶
+				</p>
+			</div>
+			<div id="interactive-audio-container">
+				<img
+					id="singer-clouds-image"
+					src="/hc-static-images/hc-static-images-SingerWithCloud06.webp"
+					alt="Smiling plastic toy singer with headphones"
+				/>
+				<div id="audio-hover-area"></div>
+				<audio
+					id="stereo-audio"
+					src="/hc-static-media/Give My Regards to Broadway LOOP.mp3"
+					preload="auto"
+					loop=""
+				></audio>
+			</div>
+		</div>
+	</div>
+</section>

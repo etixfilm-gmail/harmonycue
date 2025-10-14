@@ -1,0 +1,43 @@
+<%- // c•onsole.log("hc-views/pages/sampler.ejs") %>
+<!-- sampler.ejs gets loaded by hc-views/layout/index.ejs -->
+<!-- as < %- include(`../pages/${sectionName}`, locals) % > -->
+<!-- where sectionName = "sampler"  -->
+
+<section id="sampler-section" class="dark-bar">
+	<div id="sampler-container" class="section-container pb-5">
+
+		<div class="pb-5"></div>
+		<p id="sampler-description" class="pb-0 font-4 font-light">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		</p>
+		<% samplerList.forEach((track, index) => { %>
+			<% // c•onsole.log(`index: ${index}`) %>
+			<% if (track["line-type"] === "heading-text-only") { %>
+				<% // c•onsole.log(`track.contents[0]: ${track.contents[0]}`) %>
+				<div class="font-8 font-light pb-0 pt-4"><%= track.contents[0] %></div>
+				<div class="sampler-spacer pb-5"></div>
+			<% } else { %>
+				<% if (track["line-type"] === "sampler-items") { %>
+					<% track.contents.forEach(function (samplerItem, i) { %>
+						<audio-player
+							id="sample<%= index+i %>"
+							src="/hc-static-media/<%= samplerItem.source %>"
+							title="<%= samplerItem.description %>"
+							bar-width="4"
+							bar-gap="2"
+							buffer-percentage="75"
+							preload
+						></audio-player>
+						<div class="sampler-spacer pb-5"></div>
+					<% }) %>
+				<% } %>
+			<% } %>
+		<% }) %>
+		<div class="pb-4"></div>
+	</div>
+</section>
+<div> 		
+	
+				</div> 
+
+

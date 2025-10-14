@@ -1,0 +1,95 @@
+/* hc-static-css-contact.css gets loaded by 
+/* hc-static-css/hc-static-css-styles.css
+/* as @import url("hc-static-css-contact.css") */
+
+.send-btn {
+	width: var(--btn-size);
+	height: var(--btn-size);
+	z-index: 10;
+	position: relative;
+	/* display: flex; */
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: url("/hc-static-images/hc-static-images-btn-purple.webp")
+		no-repeat center center;
+	background-size: cover;
+	border-radius: calc(var(--btn-size) * 0.15);
+}
+
+/* Icon inside the btn */
+.send-btn-icon {
+	width: calc(var(--btn-size) * 0.6);
+	height: calc(var(--btn-size) * 0.6);
+	object-fit: contain;
+}
+
+.contact-form-control {
+	width: 100%;
+	padding: 0.5em;
+	border: 2px solid #ccc;
+	border-radius: 4px;
+	outline: none;
+}
+
+.contact-form-control:hover {
+	border: 2px solid #a384ab !important;
+	outline: none;
+}
+
+.contact-form-control:focus {
+	border: 2px solid #460c61 !important;
+	height: calc(var(--btn-size)-4);
+	outline: none;
+	/* box-shadow: 0 0 0 2px #e6d9ec; /* Optional soft glow for accessibility */
+}
+
+.contact-form-label {
+	display: block;
+	margin-bottom: 0.25em;
+	font-weight: 400;
+}
+
+.contact-form-submit-row {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	flex-wrap: wrap;
+	margin-top: 1em;
+	position: relative;
+}
+
+.contact-form-confirmation {
+	background-color: #d1bfcf;
+	color: #460c61;
+	height: var(--btn-size);
+	border: 1px solid #744886;
+	border-radius: 6px;
+	padding: 0.75em 1em;
+	font-weight: 600;
+	animation: fadeIn 0.4s ease-in;
+	white-space: nowrap;
+	opacity: 1;
+	transition: opacity 0.5s;
+}
+
+.contact-form-error {
+	background-color: #d1bfcf;
+	color: #460c61;
+	border: 1px solid #744886;
+	border-radius: 6px;
+	padding: 0.75em 1em;
+	font-weight: 600;
+	margin-top: 1em;
+	animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
