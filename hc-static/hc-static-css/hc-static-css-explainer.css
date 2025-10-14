@@ -1,0 +1,122 @@
+/* hc-static-css-explainer.css gets loaded by 
+/* hc-static-css/hc-static-css-styles.css
+/* as @import url("hc-static-css-explainer.css") */
+
+#expl-flex-row {
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+}
+
+#expl-text-col {
+	flex: 1 1 50%;
+	min-width: 300px;
+}
+
+#enable-audio-prompt {
+	transform: translateZ(0);
+	will-change: opacity;
+	filter: drop-shadow(
+			#fff8e8 max(1px, var(--px)) max(1px, var(--px)) calc(12 * var(--px))
+		)
+		drop-shadow(
+			#fff8e8 max(1px, var(--px)) min(-1px, calc(-1 * var(--px)))
+				calc(12 * var(--px))
+		)
+		drop-shadow(
+			#fff8e8 min(-1px, calc(-1 * var(--px))) max(1px, var(--px))
+				calc(12 * var(--px))
+		)
+		drop-shadow(
+			#fff8e8 min(-1px, calc(-1 * var(--px))) min(-1px, calc(-1 * var(--px)))
+				calc(12 * var(--px))
+		);
+	pointer-events: none; /* so clicks go through to lockJS.overlayElement */
+	margin: 0;
+	width: fit-content;
+}
+
+#enable-audio-prompt.hide {
+	animation: promptFadeOut 0.4s ease-in-out 0.1s forwards;
+	pointer-events: none;
+}
+
+/* Add fade-out animation */
+@keyframes promptFadeOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* Image container - defines size and enables cropping */
+#interactive-audio-container {
+	position: relative;
+	flex: 0 0 45vw;
+	min-width: 280px;
+	/* height: 30vw; /* Fixed height */
+	overflow: hidden; /* Crops overflowing parts of the image */
+	border: solid #460c61; /* Keeps your existing border */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Image inside the container - resized dynamically */
+#singer-clouds-image {
+	width: 110%;
+	height: auto; /* Slightly larger than container for cropping effect */
+	object-fit: cover; /* Ensures proper cropping */
+	display: block;
+}
+
+/* audio hover effect over singer with clouds */
+#audio-hover-area {
+	/* border: solid red; */
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	cursor:
+		url("/hc-static-images/hc-static-images-headphone-icon-32.png") 16 16,
+		pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	touch-action: none; /* Prevents default touch behaviors */
+	user-select: none; /* Prevents text selection */
+}
+
+#audio-hover-area,
+#audio-hover-area * {
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none; /* Prevents callout (iOS) */
+	-webkit-tap-highlight-color: transparent; /* Removes tap highlight (Android/Safari) */
+	touch-action: none; /* Prevents scrolling/pinch-to-zoom on this element */
+}
+
+#audio-hover-area:hover {
+	filter: brightness(1.05);
+	cursor:
+		url("/hc-static-images/hc-static-images-headphone-icon-32.png") 16 16,
+		pointer;
+}
+
+#audio-hover-area.audio-active {
+	cursor:
+		url("/hc-static-images/hc-static-images-headphone-icon-32.png") 16 16,
+		pointer;
+}
+
+#audio-hover-area.green {
+	background: rgb(0, 255, 0);
+}
+
+#audio-hover-area.red {
+	background: rgb(255, 0, 0);
+}

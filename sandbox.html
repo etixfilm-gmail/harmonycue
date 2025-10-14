@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Container Resizing Sandbox</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				font-family: "League Spartan", Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #fff8e8;
+				color: #460c61;
+			}
+			#header-contents {
+				border: solid blue;
+				content: "";
+				background-image: url(`http://23.235.221.126:3000/hc-static-images/hc-static-images-music-wallpaper-light.webp`);
+				background-size: 100%;
+				background-position: top center;
+				background-repeat: repeat-y;
+				margin-top: 0px;
+				margin-bottom: 0px;
+				width: 100%;
+				padding-bottom: 0px;
+				transition: height 0.8s cubic-bezier(0.7, 0.2, 0.25, 1);
+				top: 0;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+			#splash-text-logo {
+				border: solid red;
+				background-size: 100%;
+				background-position: top center;
+				background-repeat: repeat-y;
+				margin-top: 6vw;
+				margin-bottom: 6vw;
+				width: 100%;
+				padding: 0px;
+				transition: height 0.8s cubic-bezier(0.7, 0.2, 0.25, 1);
+
+				top: 0;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+			.child1 {
+				border: solid lightseagreen;
+				background: transparent;
+				margin: 0;
+				padding: 0;
+				font-size: 1.2rem;
+			}
+			.child2 {
+				border: solid green;
+				background: transparent;
+				margin: 0;
+				padding-top: 0px;
+				padding-bottom: 0px;
+				font-size: 1.2rem;
+			}
+			.s°plash-pad {
+				border: solid green;
+				background: transparent;
+				margin: 0;
+				padding-top: 0px;
+				padding-bottom: 200px;
+				font-size: 1.2rem;
+			}
+			.animate-padding {
+				animation: padShrink 2s ease-in-out forwards;
+			}
+			@keyframes padShrink {
+				from {
+					padding-bottom: 200px;
+				}
+				to {
+					padding-bottom: 0;
+				}
+			}
+			.font-8 {
+				font-size: calc(80vw * 0.05);
+			}
+			.font-18 {
+				font-size: calc(80vw * 0.1);
+			}
+			.dark-text {
+				color: #460c61;
+			}
+			.headline {
+				position: relative;
+				top: 0vw;
+			}
+			.subhead {
+				position: relative;
+				top: 0.5vw;
+			}
+			.hc-logo-top {
+				position: relative;
+				top: 1vw;
+				height: 6vw;
+			}
+			.font-light {
+				font-weight: 300;
+			}
+		</style>
+	</head>
+	<body>
+		<button onclick="shrinkChild()">Animate Child Padding</button>
+		<section id="header-contents" class="dark-text">
+			<div id="splash-text-logo" class="container">
+				<div id="top-headline" class="font-18 font-light headline">
+					HarmonyCue.com
+				</div>
+				<div id="top-subhead" class="font-8 font-light subhead">
+					Rehearse Smarter. Sing Stronger!
+				</div>
+				<div id="hc-logo-top-div">
+					<img
+						src="http://23.235.221.126:3000/hc-static-images/hc-static-images-HCLogo_Dark.svg"
+						id="hc-logo-top"
+						class="hc-logo-top"
+					/>
+				</div>
+				<div id="splash-pad" class="splash-pad"></div>
+			</div>
+		</section>
+		<hr />
+		<label>
+			<input
+				type="checkbox"
+				id="setHeight"
+				onchange="toggleHeight(this.checked)"
+			/>
+			Force container to fixed height (200px)
+		</label>
+		<label style="margin-left: 2em">
+			<input
+				type="checkbox"
+				id="setAbsolute"
+				onchange="toggleAbsolute(this.checked)"
+			/>
+			Make first child absolutely positioned
+		</label>
+
+		<script>
+			function shrinkChild() {
+				document.getElementById(`splash-pad`).classList.add(`animate-padding`);
+			}
+			function toggleHeight(force) {
+				document.getElementById(`splash-text-logo`).style.height = force
+					? "200px"
+					: "";
+			}
+			function toggleAbsolute(force) {
+				document.getElementById(`sandbox-child`).style.position = force
+					? "absolute"
+					: "";
+				document.getElementById(`sandbox-child`).style.left = force ? "0" : "";
+				document.getElementById(`sandbox-child`).style.top = force ? "0" : "";
+			}
+		</script>
+	</body>
+</html>

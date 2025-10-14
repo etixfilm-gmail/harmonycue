@@ -1,0 +1,9 @@
+<%- console.log("✅ LOADED hc-views/layout/deferred-html.ejs") %>
+
+<div id="page-content" class="d-flex flex-column position-relative">
+	<% sectionList.forEach(function(sectionName) { %>
+		<%- include(`../pages/${sectionName}`, locals) %>
+	<% }) %>
+</div>
+
+<%- include(`../partials/footer`) %>

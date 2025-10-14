@@ -1,0 +1,209 @@
+<%- console.log(`✅ LOADED hc-views/layout/main-loader.ejs`) %>
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-lock">
+	<head>
+		<link
+			rel="preload"
+			href="/hc-static-images/hc-static-images-music-wallpaper.webp"
+			as="image"
+		/>
+		<!-- Critical splash CSS inline or a single small stylesheet -->
+		<style>
+			html.scroll-lock,
+			body.scroll-lock {
+				overflow: hidden;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			#cover-image.fade-out {
+				opacity: 0;
+				pointer-events: none;
+			}
+		</style>
+		<link rel="icon" href="/hc-static-images/hc-static-images-HCTabIcon.webp" />
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>HarmonyCue.com</title>
+
+		<!-- Google Fonts links -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body class="scroll-lock">
+		<div
+			id="global-audio-unlock-overlay"
+			tabindex="0"
+			style="
+				position: fixed;
+				z-index: 99999;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				width: 100vw;
+				height: 100vh;
+				background: rgba(50, 255, 50, 0.5); /* full transparency */
+				pointer-events: auto;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			"
+		></div>
+		<div
+			id="cover-image"
+			style="
+				position: fixed;
+				inset: 0;
+				z-index: 9999;
+				background-image: url(&quot;/hc-static-images/hc-static-images-music-wallpaper.webp&quot;);
+				background-size: 100% auto;
+				background-position: top center;
+				background-color: #c59d71;
+				transition: opacity 1s cubic-bezier(0.4, 0.2, 0.3, 1);
+				opacity: 1;
+				pointer-events: auto;
+			"
+			aria-busy="true"
+			aria-label="Loading"
+		></div>
+		<!-- TESTING DIV, TO BE REMOVED FOR DEPLOYMENT -->
+		<!-- Enhanced console-logs div for mobile testing -->
+		<div
+			id="console-logs"
+			style="
+				border: 1px solid #ff4444;
+				border-radius: 8px 8px 0 0;
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				width: 100vw;
+				height: 25vh;
+				max-height: 200px;
+				min-height: 120px;
+				overflow-y: auto;
+				overflow-x: hidden;
+				background: #000000e6;
+				color: #fff8e8;
+				font-family: &quot;Courier New&quot;, monospace;
+				font-size: 9px;
+				line-height: 1.2;
+				z-index: 100000;
+				pointer-events: auto;
+				padding: 8px 8px 8px 12px;
+				box-shadow: 0 -2px 10px rgba(0, 0, 0, 0);
+			"
+		></div>
+
+		<script>
+			// for (const t of ["pointerdown", "pointerup", "click"]) {
+			// 	document
+			// 		.getElementById("console-logs")
+			// 		.addEventListener(t, (e) => mmm(t, e.pointerType || "mouse"));
+			// }
+
+			// Simple debug logger to send messages to mobile display
+			let mmmLog = "";
+			function mmm(msg) {
+				const logDiv = document.getElementById("console-logs");
+				if (!logDiv) return;
+				console.log(">mmm " + logDiv.childElementCount + " " + msg);
+				// Limit total messages for performance
+				// if (logDiv.children.length > 40) logDiv.removeChild(logDiv.firstChild);
+				// Append new log line
+				const line = document.createElement("div");
+				line.textContent = "> " + msg;
+				mmmLog = mmmLog + line.textContent + "\n";
+				logDiv.appendChild(line);
+				logDiv.scrollTop = logDiv.scrollHeight; // Auto-scroll
+				// mmmLogDump();
+			}
+
+			function mmmLogDump() {
+				console.log(mmmLog);
+			}
+
+			// Simple debug logger to trace DOM event listeners
+			function xxx(theEvent) {
+				// get an ISO timestamp (or use performance.now() for ms precision)
+				const ts = new Date().toISOString();
+				const otherIndex = eRegistryJS.findByReference(theEvent).index;
+				const tag = "▶️";
+				const stack = Error().stack.split("\n");
+				const callerLine = stack[2];
+				const functionName =
+					callerLine.match(/at\s+(.+?)\s+\(/)?.[1] ||
+					callerLine.match(/at\s+(\w+)/)?.[1] ||
+					"unknown";
+
+				// prepend `[ts]` to your log
+				mmm(
+					`[${ts}] ${tag} ${functionName}() -> 📊 [Event:${otherIndex ?? "n/a"}] ` +
+						`${theEvent.type} pointerType:${theEvent.pointerType} ` +
+						`triggered by <${theEvent.target.tagName}> ` +
+						`id:"${theEvent.target.id}" className:"${theEvent.target.className}"`
+				);
+			}
+
+			// Simple debug logger to trace function callers
+			function zzz(tag = "📞") {
+				const stack = new Error().stack.split("\n");
+
+				const functionCalledLine = stack[2]?.trim() || "";
+				const callerLine = stack[3]?.trim() || "";
+
+				const extractInfo = (line) => {
+					const match =
+						line.match(/at\s+(.*?)\s+\((.*):(\d+):\d+\)/) ||
+						line.match(/at\s+(.*):(\d+):\d+/);
+					if (match) {
+						let func = "(anonymous)";
+						let script = "";
+						let lineNum = "?";
+
+						if (match.length === 4) {
+							func = match[1];
+							script = match[2];
+							lineNum = match[3];
+						} else if (match.length === 3) {
+							script = match[1];
+							lineNum = match[2];
+						}
+
+						// Extract filename only from full path
+						const scriptName = script.split("/").pop();
+
+						return {
+							func,
+							script: scriptName,
+							line: lineNum,
+						};
+					}
+
+					return {
+						func: "(unknown)",
+						script: "(unknown)",
+						line: "?",
+					};
+				};
+
+				const current = extractInfo(functionCalledLine);
+				const caller = extractInfo(callerLine);
+
+				mmm(
+					`${tag} ${current.func}() called by ${caller.func}() ${caller.script}:${caller.line}`
+				);
+			}
+		</script>
+
+		<script type="module" src="/hc-static-js/hc-static-js-init.js"></script>
+	</body>
+</html>

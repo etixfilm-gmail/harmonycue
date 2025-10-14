@@ -1,0 +1,142 @@
+> 📋 Registered [Event:1] load|undefined from [object HTMLDocument] [object Window]
+> 📊 [Event:1] load|undefined: used by initJS.firstInit (total uses: 1)
+> 📊 [Event:1] load|undefined: used by initJS.overseeLoadingAndInit (total uses: 2)
+> 📊 [Event:1] load|undefined: used by initJS.injectStylesheetsOrdered (total uses: 3)
+> 📊 [Event:1] load|undefined: used by initJS.injectScriptsParallel (total uses: 4)
+> 📊 [Event:1] load|undefined: used by initJS.loadDeferredHtmlAndWait (total uses: 5)
+> 📊 [Event:1] load|undefined: used by initJS.waitForFullVisualReadiness (total uses: 6)
+> 📋 Registered [Event:2] loadedmetadata|undefined from sample4 sample4
+> 📋 Registered [Event:3] loadedmetadata|undefined from sample1 sample1
+> 📋 Registered [Event:4] loadedmetadata|undefined from sample3 sample3
+> 📋 Registered [Event:5] loadedmetadata|undefined from sample2 sample2
+> 📋 Registered [Event:6] loadedmetadata|undefined from sample5 sample5
+> 🎬 Starting handlersJS.init()
+> 🎬 Starting explainerJS.init()
+> 🎬 Starting splashJS.init()
+> 🎬 Starting lockJS.init()
+> 🎬 Starting utilsJS.init()
+> ✅ explainerJS initialized
+> 🎬 splashJS.startSplashAnimation() starting
+> 📋 Registered [Event:7] animationend|undefined from cover-image cover-image
+> 📊 [Event:7] animationend|undefined: used by handlersJS.removeCoverImage (total uses: 1)
+> 📋 Registered [Event:8] pointerdown|touch from global-audio-unlock-overlay global-audio-unlock-overlay
+> 📊 [Event:8] pointerdown|touch: used by lockJS.onStart (total uses: 1)
+> 📊 [Event:8] pointerdown|touch: used by utilsJS.hasValidCoordinates (total uses: 2)
+> utilsJS.hasValidCoordinates → true (clientX: 285, clientY: 448)
+> 📊 [Event:8] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 3)
+> 📋 Registered [Event:9] pointerup|touch from global-audio-unlock-overlay global-audio-unlock-overlay
+> 📊 [Event:9] pointerup|touch: used by lockJS.onEnd (total uses: 1)
+> ⛔️ Not a trusted gesture (duration: 158, movement: 115.03912377969505)
+> 🔁 lockJS.reset()
+> 📊 [Event:9] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 2)
+> 📋 Registered [Event:10] pointerdown|touch from global-audio-unlock-overlay global-audio-unlock-overlay
+> 📊 [Event:10] pointerdown|touch: used by lockJS.onStart (total uses: 1)
+> 📊 [Event:10] pointerdown|touch: used by utilsJS.hasValidCoordinates (total uses: 2)
+> utilsJS.hasValidCoordinates → true (clientX: 286, clientY: 460)
+> 📊 [Event:10] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 3)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 📋 Registered [Event:11] pointerdown|touch from global-audio-unlock-overlay global-audio-unlock-overlay
+> 📊 [Event:11] pointerdown|touch: used by lockJS.onStart (total uses: 1)
+> 📊 [Event:11] pointerdown|touch: used by utilsJS.hasValidCoordinates (total uses: 2)
+> utilsJS.hasValidCoordinates → true (clientX: 204, clientY: 389)
+> 📊 [Event:11] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 3)
+> 📝 [Event:11] pointerdown|touch already exists
+> 📋 Registered [Event:12] pointerup|touch from global-audio-unlock-overlay global-audio-unlock-overlay
+> 📊 [Event:12] pointerup|touch: used by lockJS.onEnd (total uses: 1)
+> ✅ Trusted gesture (duration: 59.99999999999909, movement: 0)
+> 📊 [Event:12] pointerup|touch: used by lockJS.handleUnlock (total uses: 2)
+> 📊 [Event:12] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 3)
+> 📝 [Event:12] pointerup|touch already exists
+> 📋 Registered [Event:13] pointerenter|touch from audio-hover-area audio-hover-area
+> 📊 [Event:13] pointerenter|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerenter, time: 8498, pointerType: touch, inside: true, isPlaying: false,
+> 📋 Registered [Event:14] pointerdown|touch from audio-hover-area audio-hover-area
+> 📊 [Event:14] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerdown, time: 8499, pointerType: touch, inside: true, isPlaying: false,
+> 📊 [Event:14] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 2)
+> 📝 [Event:14] pointerdown|touch already exists
+> 📋 Registered [Event:15] pointerup|touch from audio-hover-area audio-hover-area
+> 📊 [Event:15] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerup, time: 9421, pointerType: touch, inside: true, isPlaying: false,
+> 📊 [Event:15] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 2)
+> 📝 [Event:15] pointerup|touch already exists
+> 📋 Registered [Event:16] pointerleave|touch from audio-hover-area audio-hover-area
+> 📊 [Event:16] pointerleave|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerleave, time: 9425, pointerType: touch, inside: true, isPlaying: false,
+> 📋 Registered [Event:17] pointerenter|touch from audio-hover-area audio-hover-area
+> 📊 [Event:17] pointerenter|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerenter, time: 10928, pointerType: touch, inside: true, isPlaying: false,
+> 📋 Registered [Event:18] pointerdown|touch from audio-hover-area audio-hover-area
+> 📊 [Event:18] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerdown, time: 10929, pointerType: touch, inside: true, isPlaying: false,
+> 📊 [Event:18] pointerdown|touch: used by explainerJS.isInsideHoverArea (total uses: 2)
+> 📝 [Event:18] pointerdown|touch already exists
+> 📋 Registered [Event:19] pointerup|touch from audio-hover-area audio-hover-area
+> 📊 [Event:19] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerup, time: 10950.000000000002, pointerType: touch, inside: true, isPlaying: false,
+> 📊 [Event:19] pointerup|touch: used by explainerJS.isInsideHoverArea (total uses: 2)
+> 📝 [Event:19] pointerup|touch already exists
+> 📋 Registered [Event:20] pointerleave|touch from audio-hover-area audio-hover-area
+> 📊 [Event:20] pointerleave|touch: used by explainerJS.isInsideHoverArea (total uses: 1)
+> 🧪 pointerleave, time: 10952, pointerType: touch, inside: true, isPlaying: false,
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+> 🚫 Mobile resize ignored (likely zoom)
+
+x^2 + 3*x + 1
+Plus[Power[x, 2], Times[3, x], 1]
+
+Plot[x^2, {x, -2, 2}]
+Plot[Power[x, 2], List[x, -2, 2]]
+Not confident that I know what the Plot head means. I assumed it was some plotting function in which each of the items in List is mapped onto function(x^2) = clientY
+
+{{1, 2}, {3, 4}}
+List[[1, 2],List[3, 4]]
+
+
+✅ Click on background element, no listeners, no response
+✅ Click on hoverArea, audio starts
+✅ Click on sample player button, audio starts 
+🚫 Click on text input field, no i-bar cursor, no response
+
+Can you tell me what I'm missing here? I search the EventRegistry by someEvent.eventReference --
+foundEntry = this.events.find((e) => e.eventReference === eventRef);
+If the function returns empty...
+if (!foundEntry) {...}
+then I want to search by key. If eventRef contains a key it will be eventRef.detial.customKey. If it doesn't have a key how do I check for that.
+The eventRef I'm testing is: Event {isTrusted: true, type: 'load', target: document, currentTarget: Window, eventPhase: 2, …}
+It has no customKey. It has no "detail" property. Should I check if (!eventRef.detail) or something else?

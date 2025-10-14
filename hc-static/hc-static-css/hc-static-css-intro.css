@@ -1,0 +1,46 @@
+/* hc-static-css-intro.css gets loaded by 
+/* hc-static-css/hc-static-css-styles.css
+/* as @import url("hc-static-css-intro.css") */
+
+.intro-gap {
+	gap: calc(var(--section-width) / 17.5417);
+}
+
+#intro-text-samples {
+	padding-top: calc(var(--section-width) / 27);
+}
+
+/* Image container - defines size and enables cropping */
+#intro-image-container {
+	flex: 0 0 calc(var(--section-width) * 0.3667); /* Forces fixed width */
+	height: calc(var(--section-width) * 0.8); /* Fixed height */
+	overflow: hidden; /* Crops overflowing parts of the image */
+	border: solid #fff8e8; /* Keeps your existing border */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Image inside the container - resized dynamically */
+#intro-image {
+	width: calc(var(--section-width) * 0.47);
+	height: auto; /* Slightly larger than container for cropping effect */
+	object-fit: cover; /* Ensures proper cropping */
+}
+
+/* .funny-choir {
+	height: 25vw;
+} */
+
+#intro-samples-link {
+	color: #fff8e8;
+	text-decoration-line: none;
+	text-shadow: 0px 0px 0px #d8a5ff;
+	cursor: pointer;
+}
+
+#intro-samples-link:hover {
+	color: white;
+	text-decoration-line: none;
+	text-shadow: 0px 0px 6px #d8a5ff; /* Optional hover effect */
+}

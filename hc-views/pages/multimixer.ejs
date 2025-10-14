@@ -1,0 +1,114 @@
+<%- console.log("✅ LOADED hc-views/pages/multimixer.ejs") %>
+<!-- multimixer.ejs gets loaded by hc-views/layout/main-loader.ejs -->
+<!-- as < %- include("../pages/${sectionName}", locals) % > -->
+<!-- where sectionName = "multimixer"  -->
+
+<!-- prettier-ignore -->
+<script>
+	const multimixerJS = window.multimixerJS = window.multimixerJS || {};
+	multimixerJS.trackData = <%- JSON.stringify(trackData) %>;
+    // Store the data for later use
+</script>
+
+<section id="multimixer" class="dark-bar">
+	<div class="section-container">
+		<div style="display: none">source file: multimixer.ejs</div>
+
+		<div id="mxr-description" class="mxr-description">
+			<div id="mxr-text-header-1" class="font-8 font-light">Try it. FREE.</div>
+				<div id="mxr-text-1" class="font-3 font-light">
+					<p>CUSTOM MIX: Play around with the sliders, dials, mute and unmute any track you wish and experience the HarmonyCue difference. Give it a shot! Or, try one of our presets below.</p>
+					<p>STEREO SPLIT: Hear the main part in your left ear, and the rest of the accompaniment in the right, minus the piano and tempo click track.</p>
+					<p>PART PREDOMINANT: This preset puts the main part at full volume, while it limits the rest of the parts accompaniment to half, and mutes the piano and tempo click track.</p>
+					<p>YOURS TO KEEP: When you're happy with your mix, push the download button and save a copy of your very own.</p>
+				</div>
+		</div>
+
+		</div>
+		<div id="mxr-presets" class="mxr-presets">
+			<button id="mxr-custom-btn" class="mxr-preset-btn font-3 font-light">Custom Mix</button>
+			<button id="mxr-split-btn" class="mxr-preset-btn font-3 font-light">Stereo Split</button>
+			<button id="mxr-predominant-btn" class="mxr-preset-btn font-3 font-light">Part Predominant</button>
+			<div id="mxr-voice-selection" class="mxr-voice-selection">
+				<% if (mxrVoicePartList && mxrVoicePartList.forEach) { %>
+					<% mxrVoicePartList.forEach(function (voice) { %>
+						<label class="mxr-radio font-3 font-med">
+							<span class="mxr-voice-letter"><%= voice.label %></span>
+							<input type="radio" name="voice" value="<%= voice.part %>" aria-label="Select <%= voice.part %> voice" disabled>
+							<span class="mxr-custom-radio"></span>
+						</label>
+					<% }) %>
+				<% } else { %>
+					<!-- Default voice radio buttons when no voice part list is provided -->
+					<label class="mxr-radio font-3 font-med">
+						<span class="mxr-voice-letter">S</span>
+						<input type="radio" name="voice" value="Soprano" aria-label="Select Soprano voice" disabled>
+						<span class="mxr-custom-radio"></span>
+					</label>
+					<label class="mxr-radio">
+						<span class="mxr-voice-letter">A</span>
+						<input type="radio" name="voice" value="Alto" aria-label="Select Alto voice" disabled>
+						<span class="mxr-custom-radio"></span>
+					</label>
+					<label class="mxr-radio">
+						<span class="mxr-voice-letter">T</span>
+						<input type="radio" name="voice" value="Tenor" aria-label="Select Tenor voice" disabled>
+						<span class="mxr-custom-radio"></span>
+					</label>
+					<label class="mxr-radio">
+						<span class="mxr-voice-letter">B</span>
+						<input type="radio" name="voice" value="Bass" aria-label="Select Bass voice" disabled>
+						<span class="mxr-custom-radio"></span>
+					</label>
+				<% } %>
+			</div>
+		</div>		
+
+		<!-- 🎵 Player Area with Purple Border -->
+		<div id="mxr-player" class="mxr-player mxr-player-border">
+			<% mxrTracksList.forEach(function (track, key) { %>
+			<div  id="mxr-track-<%= key %>" class="mxr-track" data-track-index="<%= key %>">
+				<div class="mxr-timeline-container">
+					<progress id="mxr-timeline-<%= key %>" class="mxr-timeline" value="0" max="100"></progress>
+					<div class="mxr-track-label font-3 font-light"><%= track.descr?.name || track.src.replace(/\.[^/.]+$/, "") %></div>
+				</div>
+				
+				<div class="mxr-dial-container">
+					<div id="mxr-dial-<%= key %>" class="mxr-dial" name="waiting">
+						<div id="mxr-indicator-<%= key %>" class="mxr-indicator"></div>
+						<div class="mxr-dial-label mxr-left-label">L</div>
+						<div class="mxr-dial-label mxr-right-label">R</div>
+					</div>
+				</div>
+				
+				<input id="mxr-slider-<%= key %>" class="mxr-volume-slider" type="range" min="0" max="1" step="0.01"/>
+				
+				<button id="mxr-mute-btn-<%= key %>" class="mxr-control-btn" aria-pressed="false" aria-label="Mute track <%= track.label %>">
+					<img class="mxr-mute-icon" src="/hc-static-images/hc-static-images-volume-mute-fill.svg" alt="">
+				</button>
+				
+				<audio class="mxr-audio-track" src="/hc-static-media/<%= track.src %>" preload="none" name="<%= track.label %>"></audio>
+
+				<div class="mxr-dim-overlay" aria-hidden="true"></div>
+			</div>
+		<% }) %>
+			<div id="mxr-timeline-slider" class="mxr-timeline-slider"></div>
+	</div>
+
+	<!-- 🎛️ Playback Buttons Below Player -->
+	<div id="mxr-btns">
+		<button id="mxr-play-btn" class="mxr-control-btn" aria-pressed="false" aria-label="Play">
+			<img class="mxr-control-btn-icon" src="/hc-static-images/hc-static-images-play-fill.svg" alt="">
+		</button>
+		<button id="mxr-pause-btn" class="mxr-control-btn" aria-pressed="false" aria-label="Pause">
+			<img class="mxr-control-btn-icon" src="/hc-static-images/hc-static-images-pause-fill.svg" alt="">
+		</button>
+		<button id="mxr-rewind-btn" class="mxr-control-btn" aria-label="Rewind">
+			<img class="mxr-control-btn-icon" src="/hc-static-images/hc-static-images-rewind-fill.svg" alt="">
+		</button>
+		<button id="mxr-download-btn" class="mxr-control-btn" aria-label="Download mix">
+			<img class="mxr-control-btn-icon" src="/hc-static-images/hc-static-images-download-fill.svg" alt="">
+		</button>
+	</div>
+	<div class="pb-4"></div>
+</section>

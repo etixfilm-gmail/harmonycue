@@ -1,0 +1,221 @@
+/* "hc-static-css/hc-static-css-base" */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: "League Spartan", Tahoma, Geneva, Verdana, sans-serif;
+	background-color: #fff8e8;
+	color: #460c61;
+}
+
+body.ready {
+	visibility: visible;
+}
+
+.hidden {
+	display: none;
+}
+
+.d-flex {
+	display: flex !important;
+}
+
+.flex-column {
+	flex-direction: column !important;
+}
+
+/* FORMERLY "hc-static-css-layout" */
+
+#page-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+#page-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.hidden {
+	visibility: hidden;
+	opacity: 0;
+}
+
+.vert-center {
+	align-items: center;
+}
+
+.horiz-center {
+	justify-content: center;
+}
+
+.scroll-lock {
+	overflow: hidden;
+	height: 100vh;
+}
+
+/* FORMERLY "hc-static-css-components" */
+
+.section-container {
+	/* border: solid red; */
+	width: var(--section-width);
+	/* max-width: 1200px; optional: caps it on large screens */
+	margin: 0 auto;
+	padding: var(--y-pad) 0px;
+}
+
+.dark-text {
+	color: #460c61;
+}
+
+.light-text {
+	color: #fff8e8;
+}
+
+.dark-bar {
+	background-image: url("/hc-static-images/hc-static-images-purple-wall-texture-seamless.webp");
+	width: 100%;
+	color: #fff8e8;
+}
+
+.light-bar {
+	background: center/cover no-repeat fixed
+		url("/hc-static-images/hc-static-images-music-wallpaper-light.webp");
+	width: 100%;
+	color: #460c61;
+}
+
+.headline1 {
+	font-weight: 300;
+}
+
+.headline2 {
+	font-size: calc(var(--section-width) * 0.05);
+	font-weight: 300;
+}
+
+.subhead {
+	position: relative;
+	top: -3vw;
+}
+
+.body1 {
+	font-size: max(1.75vw, 16px);
+}
+
+.body2 {
+	font-size: max(1.5vw, 12px);
+}
+
+.text1 {
+	font-weight: 250;
+	font-size: var(--font-rg);
+}
+
+.text1.bold {
+	font-weight: 400;
+}
+
+.font-xs {
+	font-size: calc(var(--section-width) * 0.01);
+	font-weight: 300;
+}
+.font-sm-x {
+	font-size: 111;
+	font-weight: 300;
+}
+.font-md-x {
+	font-size: 111;
+	font-weight: 300;
+}
+.font-rg-x {
+	font-size: 111;
+	font-weight: 300;
+}
+.font-lg-x {
+	font-size: 111;
+	font-weight: 300;
+}
+.font-xl-x {
+	font-size: 111;
+	font-weight: 300;
+}
+.font-light {
+	font-weight: 300;
+}
+.font-med {
+	font-weight: 400;
+}
+.font-1 {
+	font-size: calc(var(--section-width) * 0.015);
+}
+.font-2 {
+	font-size: calc(var(--section-width) * 0.02);
+}
+.font-3 {
+	font-size: calc(var(--section-width) * 0.025);
+}
+.font-4 {
+	font-size: calc(var(--section-width) * 0.03);
+}
+.font-5 {
+	font-size: calc(var(--section-width) * 0.035);
+}
+.font-6 {
+	font-size: calc(var(--section-width) * 0.04);
+}
+.font-7 {
+	font-size: calc(var(--section-width) * 0.045);
+}
+.font-8 {
+	font-size: calc(var(--section-width) * 0.05);
+}
+.font-9 {
+	font-size: calc(var(--section-width) * 0.055);
+}
+.font-10 {
+	font-size: calc(var(--section-width) * 0.06);
+}
+.font-11 {
+	font-size: calc(var(--section-width) * 0.065);
+}
+.font-12 {
+	font-size: calc(var(--section-width) * 0.07);
+}
+.font-13 {
+	font-size: calc(var(--section-width) * 0.075);
+}
+.font-14 {
+	font-size: calc(var(--section-width) * 0.08);
+}
+.font-15 {
+	font-size: calc(var(--section-width) * 0.085);
+}
+.font-16 {
+	font-size: calc(var(--section-width) * 0.09);
+}
+.font-17 {
+	font-size: calc(var(--section-width) * 0.095);
+}
+.font-18 {
+	font-size: calc(var(--section-width) * 0.1);
+}
+.font-19 {
+	font-size: calc(var(--section-width) * 0.105);
+}
+.font-20 {
+	font-size: calc(var(--section-width) * 0.11);
+}
