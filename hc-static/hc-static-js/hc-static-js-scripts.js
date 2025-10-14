@@ -16,17 +16,9 @@ window.audioContextDiagnostic = {
 		const originalStateChange = context.onstatechange;
 		context.onstatechange = () => {
 			// c•onsole.log(`🔄 [${name}] State changed to: ${context.state}`);
-			this.logAllStates();
+			// debugJS.logAllStates();
 			if (originalStateChange) originalStateChange.call(context);
 		};
-	},
-
-	// Log current state of all contexts
-	logAllStates: function () {
-		// c•onsole.log(`\n📊 All AudioContext States:`);
-		this.contexts.forEach((context, name) => {
-			console.log(`  ${name}: ${context.state}`);
-		});
 	},
 
 	// Test if contexts can play audio
@@ -106,7 +98,7 @@ Element.prototype.addEventListener = function (type, listener, options) {
 			eRegistryJS.use(event, "wrappedListener");
 			// Log context states before handling click
 			setTimeout(() => {
-				window.audioContextDiagnostic.logAllStates();
+				// debugJS.logAllStates();
 			}, 100);
 
 			return listener.call(this, event);
@@ -121,7 +113,7 @@ Element.prototype.addEventListener = function (type, listener, options) {
 // Test scenarios
 window.runAudioTest = async function () {
 	// c•onsole.log(`\n🧪 === AUDIO CONTEXT DIAGNOSTIC TEST ===\n`);
-	window.audioContextDiagnostic.logAllStates();
+	// debugJS.logAllStates();
 };
 
 // Auto-run the test setup

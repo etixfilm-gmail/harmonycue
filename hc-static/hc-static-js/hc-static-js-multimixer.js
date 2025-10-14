@@ -5,13 +5,9 @@ mmm(`✅ LOADED hc-static-js-multimixer.js`);
 const multimixerJS = (window.multimixerJS = window.multimixerJS || {});
 
 // --- App State ---
-multimixerJS.mxrLastPreset = `none`; // ✅ Default mode
-multimixerJS.mxrAudioCtx = null;
-multimixerJS.mxrIsPlaying = false;
-multimixerJS.mxrStartTime = 0;
-multimixerJS.mxrPauseTime = 0;
-
+multimixerJS.mxrLastPreset = "none"; // ✅ Default mode
 multimixerJS.mxrMaxPanRadians = 0.75 * Math.PI;
+multimixerJS.mxrActiveBtn = null;
 multimixerJS.mxrActiveDial = null;
 multimixerJS.mxrActiveElement = null;
 multimixerJS.mxrActiveTargetType = null;
@@ -45,7 +41,7 @@ multimixerJS.defaultPresets = {
 
 multimixerJS.setupTrackListFromJSON = function () {
 	// Extract song name from the JSON and store it
-
+	// c•onsole.log(`songName: ${JSON.stringify(multimixerJS.trackData[0])}`);
 	multimixerJS.songName = JSON.stringify(multimixerJS.trackData[0]);
 
 	// return multimixerJS.trackData[1].map((t, index) => {
@@ -56,9 +52,9 @@ multimixerJS.setupTrackListFromJSON = function () {
 			element: document.getElementById(`mxr-track-${index}`),
 			label: t.descr?.name || t.src.replace(/\.[^/.]+$/, ``),
 			src: t.src,
-			trackType: t.descr?.type || `unknown`,
-			btnLetter: t.descr?.btnletter || t.descr?.name?.charAt(0) || `?`,
-			presets: t.descr?.presets || `default`,
+			trackType: t.descr?.type || "unknown",
+			btnLetter: t.descr?.btnletter || t.descr?.name?.charAt(0) || "?",
+			presets: t.descr?.presets || "default",
 			buffer: null,
 			gainValue: 0.5,
 			panValue: 0.0,
@@ -80,7 +76,28 @@ multimixerJS.mxrTimelineSlider = {
 // -- Initialize all parts of multimixer
 multimixerJS.init = async function () {
 	//z•zz();
-	mmm("🎬 Starting multimixerJS.init()");
+	// m•mm("🎬 Starting multimixerJS.init()!");
+
+	// c•onsole.log(`multimixerJS.trackData[0]:${JSON.stringify(multimixerJS.trackData[0])}`);
+
+	// Normalize server data → ensure trackData exists
+	if (!multimixerJS.trackData && Array.isArray(multimixerJS.mxrTracksList)) {
+		multimixerJS.trackData = [
+			multimixerJS.songName || "Unknown",
+			multimixerJS.mxrTracksList,
+		];
+	}
+
+	if (
+		(!multimixerJS.mxrTrackArray ||
+			!Array.isArray(multimixerJS.mxrTrackArray) ||
+			multimixerJS.mxrTrackArray.length === 0) &&
+		multimixerJS.trackData &&
+		Array.isArray(multimixerJS.trackData[1])
+	) {
+		multimixerJS.mxrTrackArray = multimixerJS.setupTrackListFromJSON();
+		// m•mm(`✅ Built mxrTrackArray: ${multimixerJS.mxrTrackArray.length} tracks`);
+	}
 
 	// Process raw data if it exists
 	if (multimixerJS.rawTrackData && multimixerJS.songName) {
@@ -90,10 +107,23 @@ multimixerJS.init = async function () {
 		);
 	}
 
+	// c•onsole.log(`mxrTrackArray[0].element:${JSON.stringify(multimixerJS.mxrTrackArray[0].element.id)}`);
+
+	// 🔧 Ensure mxrTrackArray exists before we bail
+	if (!multimixerJS.mxrTrackArray || multimixerJS.mxrTrackArray.length === 0) {
+		if (multimixerJS.trackData && Array.isArray(multimixerJS.trackData[1])) {
+			// Build from injected JSON
+			multimixerJS.mxrTrackArray = multimixerJS.setupTrackListFromJSON();
+		} else if (Array.isArray(multimixerJS.mxrTrackList)) {
+			// Fallback: use any precomputed list
+			multimixerJS.mxrTrackArray = multimixerJS.mxrTrackList;
+		}
+	}
+
 	// Check if we have tracks to work with
 	if (!multimixerJS.mxrTrackArray || multimixerJS.mxrTrackArray.length === 0) {
 		console.error(
-			`No tracks available in mxrTrackArray. Cannot initialize multimixer.`
+			`⛔ No tracks available in mxrTrackArray. Cannot initialize multimixer.`
 		);
 		return; // Exit early
 	}
@@ -108,13 +138,15 @@ multimixerJS.init = async function () {
 	multimixerJS.initPanDials();
 	multimixerJS.initVolumeSliders();
 	multimixerJS.initPresetButtons();
+
+	mmm("✅ multimixerJS initialized");
 };
 
 /////////////// INIT FUNCTIONS /////////////////
 
 multimixerJS.initVolumeSliders = function () {
 	// Get all volume sliders
-	const volumeSliders = document.querySelectorAll(`.mxr-volume-slider`);
+	const volumeSliders = document.querySelectorAll(".mxr-volume-slider");
 
 	volumeSliders.forEach((slider, index) => {
 		// Set initial value based on mxrTrack gainValue
@@ -124,8 +156,8 @@ multimixerJS.initVolumeSliders = function () {
 		}
 
 		// Add input event listener for real-time updates
-		slider.addEventListener(`input`, (event) => {
-			window.EventRegistry.register(event);
+		slider.addEventListener("input", (event) => {
+			event = eRegistryJS.register(event);
 			const slider = event.target;
 
 			const volume = parseFloat(slider.value);
@@ -138,41 +170,16 @@ multimixerJS.initVolumeSliders = function () {
 
 multimixerJS.initPanDials = function () {
 	// Get all dial containers
-	const dialContainers = document.querySelectorAll(`.mxr-dial`);
+	const dialContainers = document.querySelectorAll(".mxr-dial");
 
 	// Initialize each dial
-	for (
-		i = 0, len = document.querySelectorAll(`.mxr-dial`).length;
-		i < len;
-		i++
-	) {
+	for (let i = 0, len = dialContainers.length; i < len; i++) {
 		multimixerJS.setPanDial(i, 0);
 	}
 };
 
-multimixerJS.initActivePanDialX = function (mxrDial) {
-	const trackIndex = multimixerJS.getTrackIndex(mxrDial);
-	// Set initial dial position based on mxrTrack's panValue
-	const mxrTrack = multimixerJS.mxrTrackArray[trackIndex];
-	const indicator = document.getElementById(`.mxr-indicator-` + trackIndex);
-
-	if (indicator && mxrTrack) {
-		// Set initial rotation based on mxrTrack panValue
-		// mxrTrack.dialAngle = mxrTrack.panValue * multimixerJS.mxrMaxPanRadians;
-		mxrTrack.panValue = multimixerJS.calculatePanValue(mxrTrack.dialAngle);
-
-		/* indicator.style.transform = `translate(-50%, -150%) rotate(${angle}rad)`;
-		mxrDial.dataset.panValue = mxrTrack.panValue;
-		
-		multimixerJS.setPanOnIndex(trackIndex, mxrDial.dataset.panValue); */
-	}
-};
-
 multimixerJS.initMxrBuffers = async function () {
-	if (!multimixerJS.mxrAudioCtx) {
-		multimixerJS.mxrAudioCtx = new (window.AudioContext ||
-			window.webkitAudioContext)();
-	}
+	// const audioCtx = audiomanagerJS.getAudioCtx();
 
 	// Check if mxrTrackArray exists and has items
 	if (
@@ -181,7 +188,7 @@ multimixerJS.initMxrBuffers = async function () {
 		multimixerJS.mxrTrackArray.length === 0
 	) {
 		console.error(
-			`mxrTrackArray is not properly initialized:`,
+			"mxrTrackArray is not properly initialized:",
 			multimixerJS.mxrTrackArray
 		);
 		return; // Exit early to prevent errors
@@ -201,21 +208,21 @@ multimixerJS.initMxrBuffers = async function () {
 
 multimixerJS.initMuteButtons = function () {
 	// Get all mute buttons
-	const muteButtons = document.querySelectorAll("[id^=`mxr-mute-btn-`]");
+	const muteButtons = document.querySelectorAll("[id^='mxr-mute-btn-']");
 
 	muteButtons.forEach((button, index) => {
-		button.addEventListener(`click`, (event) => {
-			window.EventRegistry.register(event);
+		button.addEventListener("click", (event) => {
+			eRegistryJS.register(event);
 			const mxrTrack = multimixerJS.mxrTrackArray[index];
-			const mxrTrackElement = button.closest(`.mxr-track`);
+			const mxrTrackElement = button.closest(".mxr-track");
 
 			// Toggle mute state
 			mxrTrack.isMuted = !mxrTrack.isMuted;
 
 			// Update UI
 			if (mxrTrack.isMuted) {
-				button.classList.add(`mute`);
-				mxrTrackElement.classList.add(`muted`);
+				button.classList.add("mute");
+				mxrTrackElement.classList.add("muted");
 
 				// Store current gain value before muting
 				if (mxrTrack.gainNode) {
@@ -223,8 +230,8 @@ multimixerJS.initMuteButtons = function () {
 					mxrTrack.gainNode.gain.value = 0;
 				}
 			} else {
-				button.classList.remove(`mute`);
-				mxrTrackElement.classList.remove(`muted`);
+				button.classList.remove("mute");
+				mxrTrackElement.classList.remove("muted");
 
 				// Restore audio gain from the mxrTrack's current gainValue
 				if (mxrTrack.gainNode) {
@@ -237,21 +244,21 @@ multimixerJS.initMuteButtons = function () {
 
 multimixerJS.initPresetButtons = function () {
 	// Get preset buttons
-	const customBtn = document.getElementById(`mxr-custom-btn`);
-	const stereoSplitBtn = document.getElementById(`mxr-split-btn`);
-	const partPredomBtn = document.getElementById(`mxr-predominant-btn`);
+	const customBtn = document.getElementById("mxr-custom-btn");
+	const stereoSplitBtn = document.getElementById("mxr-split-btn");
+	const partPredomBtn = document.getElementById("mxr-predominant-btn");
 
 	// Get voice selection radio buttons
-	const voiceRadios = document.querySelectorAll("input[name=`voice`]");
+	const voiceRadios = document.querySelectorAll("input[name='voice']");
 
 	// Initialize - Manual Mix active, radios disabled
-	customBtn.classList.add(`btn-on`);
-	multimixerJS.mxrLastPreset = `init`;
+	customBtn.classList.add("btn-on");
+	multimixerJS.mxrLastPreset = "init";
 	multimixerJS.enableVoiceRadios(false);
 
 	// Manual Mix Button - default state
-	customBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	customBtn.addEventListener("click", (event) => {
+		eRegistryJS.register(event);
 		// c•onsole.log(`customBtn(`click`, ()`);
 		// Update button states
 		updateButtonStates(customBtn);
@@ -260,12 +267,12 @@ multimixerJS.initPresetButtons = function () {
 		multimixerJS.enableVoiceRadios(false);
 
 		// Do NOT apply any preset - just update the mode
-		multimixerJS.mxrLastPreset = `init`;
+		multimixerJS.mxrLastPreset = "init";
 	});
 
 	// Stereo Split Button
-	stereoSplitBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	stereoSplitBtn.addEventListener("click", (event) => {
+		eRegistryJS.register(event);
 		// c•onsole.log(`stereoSplitBtn(`click`, ()`);
 		// Update button states
 		updateButtonStates(stereoSplitBtn);
@@ -275,14 +282,14 @@ multimixerJS.initPresetButtons = function () {
 		selectDefaultVoice(voiceRadios);
 
 		// Apply preset with selected voice
-		applyPreset(`stereo`, multimixerJS.getSelectedVoice());
+		applyPreset("stereo", multimixerJS.getSelectedVoice());
 
-		multimixerJS.mxrLastPreset = `stereo`;
+		multimixerJS.mxrLastPreset = "stereo";
 	});
 
 	// Part Predominant Button
-	partPredomBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	partPredomBtn.addEventListener("click", (event) => {
+		eRegistryJS.register(event);
 		// c•onsole.log(`partPredomBtn(`click`, ()`);
 		// Update button states
 		updateButtonStates(partPredomBtn);
@@ -292,19 +299,19 @@ multimixerJS.initPresetButtons = function () {
 		selectDefaultVoice(voiceRadios);
 
 		// Apply preset with selected voice
-		applyPreset(`partpre`, multimixerJS.getSelectedVoice());
+		applyPreset("partpre", multimixerJS.getSelectedVoice());
 
-		multimixerJS.mxrLastPreset = `partpre`;
+		multimixerJS.mxrLastPreset = "partpre";
 	});
 
 	// Voice radio selection
 	voiceRadios.forEach((radio) => {
-		radio.addEventListener(`change`, (event) => {
-			window.EventRegistry.register(event);
-			selectedVoice = event.target.value;
+		radio.addEventListener("change", (event) => {
+			event = eRegistryJS.register(event);
+			const selectedVoice = event.target.value;
 
 			// Apply current preset with new voice
-			if (multimixerJS.mxrLastPreset !== `init`) {
+			if (multimixerJS.mxrLastPreset !== "init") {
 				applyPreset(multimixerJS.mxrLastPreset, selectedVoice);
 			}
 		});
@@ -312,45 +319,45 @@ multimixerJS.initPresetButtons = function () {
 
 	// Add listeners to detect manual changes to controls
 	// When user manually changes controls, switch to custom mode
-	const dialContainers = document.querySelectorAll(`.mxr-dial`);
-	const volumeSliders = document.querySelectorAll(`.mxr-volume-slider`);
-	const muteButtons = document.querySelectorAll("[id^=`mxr-mute-btn-`]");
+	const dialContainers = document.querySelectorAll(".mxr-dial");
+	const volumeSliders = document.querySelectorAll(".mxr-volume-slider");
+	const muteButtons = document.querySelectorAll("[id^='mxr-mute-btn-']");
 
 	// Only switch to custom mode if we're in a preset mode
 	const switchToManualMode = () => {
-		if (multimixerJS.mxrLastPreset !== `init`) {
+		if (multimixerJS.mxrLastPreset !== "init") {
 			updateButtonStates(customBtn);
 			multimixerJS.enableVoiceRadios(false);
-			multimixerJS.mxrLastPreset = `init`;
+			multimixerJS.mxrLastPreset = "init";
 		}
 	};
 
 	// Add event listeners to controls
 	dialContainers.forEach((dial) => {
-		dial.addEventListener(`pointerdown`, (event) => {
-			window.EventRegistry.register(event);
+		dial.addEventListener("pointerdown", (event) => {
+			eRegistryJS.register(event);
 			// Only register after the drag begins
-			document.addEventListener(`pointermove`, switchToManualMode, {
+			document.addEventListener("pointermove", switchToManualMode, {
 				once: true,
 			});
 		});
 	});
 
 	volumeSliders.forEach((slider) => {
-		slider.addEventListener(`input`, switchToManualMode);
+		slider.addEventListener("input", switchToManualMode);
 	});
 
 	muteButtons.forEach((button) => {
-		button.addEventListener(`click`, switchToManualMode);
+		button.addEventListener("click", switchToManualMode);
 	});
 
 	// Helper function to update button states
 	function updateButtonStates(activeButton) {
 		[customBtn, stereoSplitBtn, partPredomBtn].forEach((btn) => {
 			if (btn === activeButton) {
-				btn.classList.add(`btn-on`);
+				btn.classList.add("btn-on");
 			} else {
-				btn.classList.remove(`btn-on`);
+				btn.classList.remove("btn-on");
 			}
 		});
 	}
@@ -380,9 +387,9 @@ multimixerJS.initPresetButtons = function () {
 
 			if (isSelectedVoice) {
 				// Special handling for selected voice
-				if (presetName === `stereo`) {
+				if (presetName === "stereo") {
 					settings = { angle: -2.3562, gain: 0.8, mute: false };
-				} else if (presetName === `partpre`) {
+				} else if (presetName === "partpre") {
 					settings = { angle: 0, gain: 1.0, mute: false };
 				} else {
 					settings = { angle: 0, gain: 0.5, mute: false };
@@ -391,13 +398,13 @@ multimixerJS.initPresetButtons = function () {
 				// Use mxrTrack's custom presets if available
 
 				if (
-					typeof mxrTrack.presets === `object` &&
+					typeof mxrTrack.presets === "object" &&
 					mxrTrack.presets[presetName]
 				) {
 					settings = mxrTrack.presets[presetName];
-				} else if (mxrTrack.presets === `default`) {
+				} else if (mxrTrack.presets === "default") {
 					// Use default presets based on mxrTrack type
-					const trackType = mxrTrack.trackType || `unknown`;
+					const trackType = mxrTrack.trackType || "unknown";
 					settings =
 						multimixerJS.defaultPresets[trackType]?.[presetName] ||
 						multimixerJS.defaultPresets.unknown[presetName];
@@ -418,7 +425,7 @@ multimixerJS.initPresetButtons = function () {
 
 			// Handle mute state separately since we have UI classes to update
 			const muteBtn = document.getElementById(`mxr-mute-btn-${index}`);
-			const mxrTrackElement = muteBtn?.closest(`.mxr-track`);
+			const mxrTrackElement = muteBtn?.closest(".mxr-track");
 
 			if (settings.mute) {
 				mxrTrack.isMuted = true;
@@ -427,8 +434,8 @@ multimixerJS.initPresetButtons = function () {
 				mxrTrack.prevGainValue = mxrTrack.gainValue;
 
 				// Update UI
-				if (muteBtn) muteBtn.classList.add(`mute`);
-				if (mxrTrackElement) mxrTrackElement.classList.add(`muted`);
+				if (muteBtn) muteBtn.classList.add("mute");
+				if (mxrTrackElement) mxrTrackElement.classList.add("muted");
 
 				// Set audio gain to 0 if playing
 				if (mxrTrack.gainNode) {
@@ -438,8 +445,8 @@ multimixerJS.initPresetButtons = function () {
 				mxrTrack.isMuted = false;
 
 				// Update UI
-				if (muteBtn) muteBtn.classList.remove(`mute`);
-				if (mxrTrackElement) mxrTrackElement.classList.remove(`muted`);
+				if (muteBtn) muteBtn.classList.remove("mute");
+				if (mxrTrackElement) mxrTrackElement.classList.remove("muted");
 
 				// Restore audio gain if playing
 				if (mxrTrack.gainNode) {
@@ -457,14 +464,14 @@ multimixerJS.initPresetButtons = function () {
 		// read pan and gain values from mxrTrack and updates dial and slider
 		// Update pan dial
 
-		const dial = document.querySelectorAll(`.mxr-dial`)[index];
+		const dial = document.querySelectorAll(".mxr-dial")[index];
 		if (dial) {
 			// multimixerJS.setPanOnIndex(index, mxrTrack.panValue);
 			multimixerJS.setPanDial(index, mxrTrack.dialAngle);
 		}
 
 		// Update volume slider
-		const slider = document.querySelectorAll(`.mxr-volume-slider`)[index];
+		const slider = document.querySelectorAll(".mxr-volume-slider")[index];
 		if (slider) {
 			slider.value = mxrTrack.gainValue;
 		}
@@ -473,19 +480,19 @@ multimixerJS.initPresetButtons = function () {
 
 // Helper function to get selected voice
 multimixerJS.getSelectedVoice = function () {
-	const checkedRadio = document.querySelector("input[name=`voice`]:checked");
+	const checkedRadio = document.querySelector("input[name='voice']:checked");
 
 	return checkedRadio ? checkedRadio.value : null;
 };
 
 // Setup voice radios based on mxrTrack metadata
 multimixerJS.setupVoiceRadios = function () {
-	const voiceRadios = document.querySelectorAll("input[name=`voice`]");
-	const voicePartLabels = document.querySelectorAll(`.mxr-voice-letter`);
+	const voiceRadios = document.querySelectorAll("input[name='voice']");
+	const voicePartLabels = document.querySelectorAll(".mxr-voice-letter");
 
 	// Identify vocal tracks
 	const vocalTracks = multimixerJS.mxrTrackArray.filter(
-		(mxrTrack) => mxrTrack.trackType === `voice`
+		(mxrTrack) => mxrTrack.trackType === "voice"
 	);
 
 	// Update radio buttons to match available vocal parts
@@ -503,17 +510,17 @@ multimixerJS.setupVoiceRadios = function () {
 
 	// Hide any extra radio buttons if we have fewer vocal parts than buttons
 	for (let i = vocalTracks.length; i < voiceRadios.length; i++) {
-		const radioLabel = voiceRadios[i].closest(`.mxr-radio`);
+		const radioLabel = voiceRadios[i].closest(".mxr-radio");
 		if (radioLabel) {
-			radioLabel.style.display = `none`;
+			radioLabel.style.display = "none";
 		}
 	}
 
 	// Show all buttons that are being used
 	for (let i = 0; i < vocalTracks.length && i < voiceRadios.length; i++) {
-		const radioLabel = voiceRadios[i].closest(`.mxr-radio`);
+		const radioLabel = voiceRadios[i].closest(".mxr-radio");
 		if (radioLabel) {
-			radioLabel.style.display = ``;
+			radioLabel.style.display = "";
 		}
 	}
 
@@ -523,7 +530,7 @@ multimixerJS.setupVoiceRadios = function () {
 
 // Helper method to enable/disable voice radio buttons
 multimixerJS.enableVoiceRadios = function (enable) {
-	const radios = document.querySelectorAll("input[name=`voice`]");
+	const radios = document.querySelectorAll("input[name='voice']");
 	radios.forEach((radio) => {
 		radio.disabled = !enable;
 		if (!enable) {
@@ -574,16 +581,16 @@ multimixerJS.calculatePanValue = function (dialAngle) {
 multimixerJS.mxrLoadTrack = async function (url) {
 	const response = await fetch(url);
 	const mxrArrayBuffer = await response.arrayBuffer();
-	return multimixerJS.mxrAudioCtx.decodeAudioData(mxrArrayBuffer);
+	return audiomanagerJS.getAudioCtx().decodeAudioData(mxrArrayBuffer);
 };
 
 multimixerJS.calculateTimelineOffset = function () {
 	const mxrTimelineRect = document
-		.querySelector(`.mxr-timeline`)
+		.querySelector(".mxr-timeline")
 		.getBoundingClientRect();
 
 	const mxrPlayerRect = document
-		.getElementById(`mxr-player`)
+		.getElementById("mxr-player")
 		.getBoundingClientRect();
 
 	multimixerJS.mxrTimelineSlider.offsetLeft =
@@ -591,9 +598,14 @@ multimixerJS.calculateTimelineOffset = function () {
 };
 
 multimixerJS.startPlayback = function () {
-	const mxrCtx = multimixerJS.mxrAudioCtx;
-	const pauseOffset = multimixerJS.mxrPauseTime;
-	multimixerJS.mxrStartTime = mxrCtx.currentTime - pauseOffset;
+	const audioCtx = audiomanagerJS.getAudioCtx();
+	if (audioCtx?.state === "suspended") {
+		try {
+			audioCtx.resume();
+		} catch {}
+	}
+	const pauseOffset = audiomanagerJS.mxrPauseTime;
+	audiomanagerJS.playStartTime = audioCtx.currentTime - pauseOffset;
 	let endedTracksCount = 0;
 	const totalTracks = multimixerJS.mxrTrackArray.length;
 
@@ -604,11 +616,11 @@ multimixerJS.startPlayback = function () {
 			return;
 		}
 
-		const source = mxrCtx.createBufferSource();
+		const source = audioCtx.createBufferSource();
 		source.buffer = mxrTrack.buffer;
 		mxrTrack.source = source;
-		const timelineSliderData = multimixerJS.mxrTimelineSlider;
-		const timelineSlider = timelineSliderData.element;
+		// const timelineSliderData = multimixerJS.mxrTimelineSlider;
+		const timelineSlider = multimixerJS.mxrTimelineSlider.element;
 
 		source.onended = function () {
 			if (multimixerJS.mxrIsPaused) endedTracksCount = 0;
@@ -617,22 +629,22 @@ multimixerJS.startPlayback = function () {
 			if (endedTracksCount === totalTracks) {
 				multimixerJS.resetTimeline();
 				multimixerJS.mxrIsPaused = false;
-				multimixerJS.mxrIsPlaying = false;
-				if (multimixerJS.mxrPlayBtn.classList.contains(`btn-on`)) {
-					multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-					timelineSlider.classList.remove(`on`);
+				audiomanagerJS.audioIsPlaying = false;
+				if (multimixerJS.mxrPlayBtn.classList.contains("btn-on")) {
+					multimixerJS.mxrPlayBtn.classList.remove("btn-on");
+					timelineSlider.classList.remove("on");
 				}
 			}
 		};
 
-		const gainNode = mxrCtx.createGain();
+		const gainNode = audioCtx.createGain();
 		// Apply the current gain value (respect muted state)
 		gainNode.gain.value = mxrTrack.isMuted ? 0 : mxrTrack.gainValue;
 
-		const panNode = mxrCtx.createStereoPanner();
+		const panNode = audioCtx.createStereoPanner();
 		// panNode.panValue = 0;
 
-		source.connect(gainNode).connect(panNode).connect(mxrCtx.destination);
+		source.connect(gainNode).connect(panNode).connect(audioCtx.destination);
 
 		source.start(0, pauseOffset);
 
@@ -644,67 +656,14 @@ multimixerJS.startPlayback = function () {
 		multimixerJS.setPanDial(index, mxrTrack.dialAngle);
 	});
 
-	multimixerJS.mxrIsPlaying = true;
-	multimixerJS.animateTimeline();
-};
-
-multimixerJS.startPlaybackX = function () {
-	const mxrCtx = multimixerJS.mxrAudioCtx;
-	const pauseOffset = multimixerJS.mxrPauseTime;
-	multimixerJS.mxrStartTime = mxrCtx.currentTime - pauseOffset;
-	let endedTracksCount = 0;
-	const totalTracks = multimixerJS.mxrTrackArray.length;
-
-	multimixerJS.mxrTrackArray.forEach((mxrTrack) => {
-		if (!mxrTrack.buffer) {
-			console.warn(`❌ No buffer found for ${mxrTrack.label}`);
-			return;
-		}
-
-		const source = mxrCtx.createBufferSource();
-		source.buffer = mxrTrack.buffer;
-		mxrTrack.source = source;
-
-		source.onended = function () {
-			if (multimixerJS.mxrIsPaused) endedTracksCount = 0;
-			endedTracksCount++;
-
-			if (endedTracksCount === totalTracks) {
-				// multimixerJS.pauseAudio();
-
-				multimixerJS.resetTimeline();
-				multimixerJS.mxrIsPaused = false;
-				multimixerJS.mxrIsPlaying = false;
-				if (multimixerJS.mxrPlayBtn.classList.contains(`btn-on`)) {
-					multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-					timelineSlider.classList.remove(`on`);
-				}
-			}
-		};
-
-		const newGainNode = mxrCtx.createGain();
-		newGainNode.gain.value = mxrTrack.gainValue ?? 0.5;
-
-		const newPanNode = mxrCtx.createStereoPanner();
-		newPanNode.pan.setValueAtTime(mxrTrack.panValue ?? 0.0, mxrCtx.currentTime);
-
-		source.connect(newGainNode).connect(newPanNode).connect(mxrCtx.destination);
-
-		source.start(0, pauseOffset);
-
-		mxrTrack.source = source;
-		mxrTrack.gainNode = newGainNode;
-		mxrTrack.panNode = newPanNode;
-	});
-
-	multimixerJS.mxrIsPlaying = true;
+	audiomanagerJS.audioIsPlaying = true;
 	multimixerJS.animateTimeline();
 };
 
 /////////////// BUTTONS, SLIDERS, UI /////////////////
 
 multimixerJS.pointerDownHandler = function (event) {
-	window.EventRegistry.use(event, "multimixerJS.pointerDownHandler");
+	eRegistryJS.use(event, "multimixerJS.pointerDownHandler");
 	const activeElement = event.target;
 	multimixerJS.mxrActiveElement = activeElement;
 	const index = multimixerJS.getTrackIndex(activeElement);
@@ -715,15 +674,15 @@ multimixerJS.pointerDownHandler = function (event) {
 
 	// add a pointermove event listener to mxr-player
 	document
-		.getElementById(`mxr-player`)
-		.addEventListener(`pointermove`, multimixerJS.pointerMoveHandler);
+		.getElementById("mxr-player")
+		.addEventListener("pointermove", multimixerJS.pointerMoveHandler);
 
-	if (targetType === `timeline`) {
+	if (targetType === "timeline") {
 		// Don't capture events on mute buttons or other controls
 		if (
-			activeElement.closest(`.mxr-control-btn`) ||
-			activeElement.closest(`.mxr-volume-slider`) ||
-			activeElement.closest(`.mxr-dial-container`)
+			activeElement.closest(".mxr-control-btn") ||
+			activeElement.closest(".mxr-volume-slider") ||
+			activeElement.closest(".mxr-dial-container")
 		) {
 			return;
 		}
@@ -731,26 +690,26 @@ multimixerJS.pointerDownHandler = function (event) {
 		const seek = multimixerJS.calculateSeek(event);
 		if (!seek) return;
 
-		document.body.style.cursor = `grab`;
+		document.body.style.cursor = "grab";
 
-		if (multimixerJS.mxrIsPlaying) {
+		if (audiomanagerJS.audioIsPlaying) {
 			multimixerJS.mxrIsPaused = true;
 			multimixerJS.pauseAudio();
 		}
 
 		const timelineSliderData = multimixerJS.mxrTimelineSlider;
 		timelineSliderData.isDragging = true;
-		activeElement.classList.add(`dragging`);
+		activeElement.classList.add("dragging");
 		activeElement.setPointerCapture(event.pointerId);
-		multimixerJS.mxrPauseTime = seek.newTime;
-		timelineSliderData.element.classList.add(`on`);
+		audiomanagerJS.mxrPauseTime = seek.newTime;
+		timelineSliderData.element.classList.add("on");
 		timelineSliderData.element.stylevent.left = `${seek.sliderX}px`;
 
 		// multimixerJS.showStoredData();
 		// timelineSliderData.element.setPointerCapture(event.pointerId);
 	}
 
-	if (targetType === `dial`) {
+	if (targetType === "dial") {
 		// multimixerJS.mxrActiveDial = event.target;
 
 		const mxrDial = activeElement;
@@ -760,11 +719,11 @@ multimixerJS.pointerDownHandler = function (event) {
 		mxrDial.dataset.centerX = centerX.toFixed(4);
 		mxrDial.dataset.centerY = centerY.toFixed(4);
 		// Visually disable other dials
-		document.querySelectorAll(`.mxr-dial`).forEach((d) => {
-			if (d !== mxrDial) d.classList.add(`dial-disabled`);
+		document.querySelectorAll(".mxr-dial").forEach((d) => {
+			if (d !== mxrDial) d.classList.add("dial-disabled");
 		});
 
-		mxrDial.classList.add(`dragging`);
+		mxrDial.classList.add("dragging");
 
 		const angle = multimixerJS.calculateDialAngle(
 			event.clientX,
@@ -778,13 +737,13 @@ multimixerJS.pointerDownHandler = function (event) {
 
 		mxrDial.setPointerCapture(event.pointerId);
 
-		mxrDial.addEventListener(`contextmenu`, (event) => {
-			window.EventRegistry.register(event);
+		mxrDial.addEventListener("contextmenu", (event) => {
+			event = eRegistryJS.register(event);
 			event.preventDefault(); // ✅ This one actually blocks the context menu
 		});
 	}
 
-	if (targetType === `slider`) {
+	if (targetType === "slider") {
 		multimixerJS.mxrActiveVolumeSlider = event.target;
 		const slider = multimixerJS.mxrActiveVolumeSlider;
 		// set pointer capture
@@ -793,7 +752,8 @@ multimixerJS.pointerDownHandler = function (event) {
 		multimixerJS.setVolumeSlider(index, parseFloat(slider.value));
 	}
 
-	if (targetType === `mute`) {
+	if (targetType === "mute") {
+		// targetType === "mute"
 	}
 
 	multimixerJS.showStoredData();
@@ -806,14 +766,14 @@ multimixerJS.pointerMoveHandler = function (event) {
 		return;
 	}
 
-	if (!activeElement.className.includes(`dragging`)) {
+	if (!activeElement.className.includes("dragging")) {
 		return;
 	}
 
 	const index = multimixerJS.mxrActiveTrackIndex;
 	const targetType = multimixerJS.mxrActiveTargetType;
 
-	if (targetType === `timeline`) {
+	if (targetType === "timeline") {
 		// Check if click is in timeline area
 		const seek = multimixerJS.calculateSeek(event);
 		if (!seek) return;
@@ -821,12 +781,12 @@ multimixerJS.pointerMoveHandler = function (event) {
 		const timelineSliderData = multimixerJS.mxrTimelineSlider;
 		if (!timelineSliderData.isDragging) return;
 
-		multimixerJS.mxrPauseTime = seek.newTime;
+		audiomanagerJS.mxrPauseTime = seek.newTime;
 		timelineSliderData.element.style.left = `${seek.sliderX}px`;
 		return;
 	}
 
-	if (targetType === `dial`) {
+	if (targetType === "dial") {
 		const mxrDial = activeElement;
 
 		const angle = multimixerJS.calculateDialAngle(
@@ -842,42 +802,42 @@ multimixerJS.pointerMoveHandler = function (event) {
 };
 
 multimixerJS.pointerUpHandler = function (event) {
-	window.EventRegistry.use(event, "multimixerJS.pointerUpHandler");
+	eRegistryJS.use(event, "multimixerJS.pointerUpHandler");
 	// remove pointermove event listener from mxr-player
 
 	document
-		.getElementById(`mxr-player`)
-		.removeEventListener(`pointermove`, multimixerJS.pointerMoveHandler);
+		.getElementById("mxr-player")
+		.removeEventListener("pointermove", multimixerJS.pointerMoveHandler);
 
 	const index = multimixerJS.mxrActiveTrackIndex;
 	const targetType = multimixerJS.mxrActiveTargetType;
 	const activeElement = multimixerJS.mxrActiveElement;
 
-	if (targetType === `timeline`) {
+	if (targetType === "timeline") {
 		// Check if click is in timeline area
 		const seek = multimixerJS.calculateSeek(event);
 		if (!seek) return;
 
-		document.body.style.cursor = `default`;
+		document.body.style.cursor = "default";
 
 		if (
 			multimixerJS.mxrIsPaused &&
-			!multimixerJS.mxrPauseBtn.classList.contains(`btn-on`)
+			!multimixerJS.mxrPauseBtn.classList.contains("btn-on")
 		) {
 			multimixerJS.startPlayback();
 			multimixerJS.mxrIsPaused = false;
-			multimixerJS.mxrIsPlaying = true;
+			audiomanagerJS.audioIsPlaying = true;
 		}
 
 		const timelineSliderData = multimixerJS.mxrTimelineSlider;
 		if (!timelineSliderData.isDragging) return;
 		timelineSliderData.isDragging = false;
-		multimixerJS.mxrPauseTime = seek.newTime;
+		audiomanagerJS.mxrPauseTime = seek.newTime;
 
 		timelineSliderData.element.style.left = `${seek.sliderX}px`;
 	}
 
-	if (targetType === `dial`) {
+	if (targetType === "dial") {
 		const mxrDial = activeElement;
 
 		const angle = multimixerJS.calculateDialAngle(
@@ -891,7 +851,7 @@ multimixerJS.pointerUpHandler = function (event) {
 		multimixerJS.setPanDial(index, angle);
 	}
 
-	if (targetType === `slider`) {
+	if (targetType === "slider") {
 		// );
 		const slider = multimixerJS.mxrActiveVolumeSlider;
 
@@ -904,28 +864,15 @@ multimixerJS.pointerUpHandler = function (event) {
 		multimixerJS.mxrActiveVolumeSlider = null;
 	}
 
-	if (targetType === `mute`) {
+	if (targetType === "mute") {
+		// targetType === "mute"
 	}
 
-	if (targetType === `timeline`) {
+	if (targetType === "timeline") {
 		const timelineSliderData = multimixerJS.mxrTimelineSlider;
 		if (!timelineSliderData.isDragging) return;
 
 		timelineSliderData.isDragging = false;
-
-		// Release pointer capture
-		// if (timelineSliderData.element.hasPointerCapture?.(event.pointerId)) {
-		// timelineSliderData.element.releasePointerCapture(event.pointerId);
-		// }
-
-		// if (
-		// multimixerJS.mxrIsPaused &&
-		// !multimixerJS.mxrPauseBtn.classList.contains(`btn-on`)
-		// ) {
-		// multimixerJS.startPlayback();
-		// multimixerJS.mxrIsPaused = false;
-		// multimixerJS.mxrIsPlaying = true;
-		// }
 	}
 
 	// Release pointer capture from activeElement
@@ -942,24 +889,23 @@ multimixerJS.pointerUpHandler = function (event) {
 };
 
 multimixerJS.setPanOnTrackX = function (mxrTrack, panValue) {
+	const audioCtx = audiomanagerJS.getAudioCtx();
 	mxrTrack.panValue = panValue;
 
 	if (!mxrTrack.panNode) {
-		mxrTrack.panNode = multimixerJS.mxrAudioCtx.createStereoPanner();
+		mxrTrack.panNode = audioCtx.createStereoPanner();
 	}
-	mxrTrack.panNode.pan.setValueAtTime(
-		mxrTrack.panValue,
-		multimixerJS.mxrAudioCtx.currentTime
-	);
+	mxrTrack.panNode.pan.setValueAtTime(mxrTrack.panValue, audioCtx.currentTime);
 
-	mxrTrack.element.getElementsByClassName(`mxr-dial`)[0].dataset.panValue =
+	mxrTrack.element.getElementsByClassName("mxr-dial")[0].dataset.panValue =
 		mxrTrack.panValue;
 	const angle = panValue * multimixerJS.mxrMaxPanRadians;
-	const indicator = mxrTrack.element.getElementsByClassName(`mxr-indicator`)[0];
+	const indicator = mxrTrack.element.getElementsByClassName("mxr-indicator")[0];
 	indicator.style.transform = `translate(-50%, -150%) rotate(${angle}rad)`;
 };
 
 multimixerJS.setPanDial = function (index, angle) {
+	const audioCtx = audiomanagerJS.getAudioCtx();
 	// sets dialAngle, panValue, and panNode.pan on mxrTrack
 	// sets dataset.panValue and dataset.dialAngle on dial
 	// moves pan indicator on dial to angle
@@ -967,7 +913,7 @@ multimixerJS.setPanDial = function (index, angle) {
 		const panValue = multimixerJS.calculatePanValue(angle);
 		const mxrTrack = multimixerJS.mxrTrackArray[index];
 		if (mxrTrack) {
-			const mxrDial = document.getElementById(`mxr-dial-` + index);
+			const mxrDial = document.getElementById("mxr-dial-" + index);
 			mxrTrack.dialAngle = angle;
 			mxrTrack.panValue = panValue;
 			mxrDial.dataset.dialAngle = angle;
@@ -977,7 +923,7 @@ multimixerJS.setPanDial = function (index, angle) {
 			if (mxrTrack.panNode) {
 				mxrTrack.panNode.pan.setValueAtTime(
 					mxrTrack.panValue,
-					multimixerJS.mxrAudioCtx.currentTime
+					audioCtx.currentTime
 				);
 			}
 		}
@@ -991,7 +937,7 @@ multimixerJS.setVolumeSlider = function (index, volume) {
 	if (!isNaN(index) && !isNaN(volume)) {
 		const mxrTrack = multimixerJS.mxrTrackArray[index];
 		// set slider.value to volume
-		document.querySelectorAll(`.mxr-volume-slider`)[index].value = volume;
+		document.querySelectorAll(".mxr-volume-slider")[index].value = volume;
 		if (mxrTrack) {
 			mxrTrack.gainValue = volume;
 			// Update gain node if playing
@@ -1008,7 +954,7 @@ multimixerJS.setVolumeSlider = function (index, volume) {
 };
 
 multimixerJS.resetTimeline = function () {
-	multimixerJS.mxrPauseTime = 0;
+	audiomanagerJS.mxrPauseTime = 0;
 	if (!multimixerJS.mxrTimelineSlider.offsetLeft)
 		multimixerJS.calculateTimelineOffset();
 	multimixerJS.mxrTimelineSlider.element.style.left =
@@ -1016,16 +962,17 @@ multimixerJS.resetTimeline = function () {
 };
 
 multimixerJS.animateTimeline = function () {
+	const audioCtx = audiomanagerJS.getAudioCtx();
 	const timelineSlider = multimixerJS.mxrTimelineSlider.element;
-	if (!timelineSlider || !multimixerJS.mxrIsPlaying) return;
+	if (!timelineSlider || !audiomanagerJS.audioIsPlaying) return;
 	if (!multimixerJS.mxrTimelineSlider.offsetLeft) {
 		multimixerJS.calculateTimelineOffset();
 	}
 	const totalWidth = document
-		.querySelector(`.mxr-timeline`)
+		.querySelector(".mxr-timeline")
 		.getBoundingClientRect().width;
-	const currentTime = multimixerJS.mxrAudioCtx.currentTime;
-	const elapsed = currentTime - multimixerJS.mxrStartTime;
+	const currentTime = audioCtx.currentTime;
+	const elapsed = currentTime - audiomanagerJS.playStartTime;
 
 	// Duration from buffer
 	const duration = multimixerJS.mxrTrackArray[0]?.buffer?.duration || 1;
@@ -1040,59 +987,51 @@ multimixerJS.animateTimeline = function () {
 		);
 	} else {
 		multimixerJS.pauseAudio();
-		timelineSlider.classList.remove(`on`);
+		timelineSlider.classList.remove("on");
 	}
 };
 
-multimixerJS.pauseAudio = function () {
+multimixerJS.pauseAudio = function (event) {
+	eRegistryJS.use(event, "multimixerJS.pauseAudio");
 	// Stop active sources
 	multimixerJS.mxrTrackArray.forEach((mxrTrack) => {
 		if (mxrTrack.source) {
 			try {
 				mxrTrack.source.stop();
 			} catch (event) {
-				console.warn(`Source already stopped:`, e);
+				console.warn("Source already stopped:", event);
 			}
 			mxrTrack.source = null;
 		}
 	});
-	multimixerJS.mxrIsPlaying = false;
+	audiomanagerJS.audioIsPlaying = false;
 	cancelAnimationFrame(multimixerJS.mxrTimelineSlider.updateRequest);
 };
 
 multimixerJS.initPlaybackBtns = function () {
-	multimixerJS.mxrPlayBtn = document.getElementById(`mxr-play-btn`);
-	multimixerJS.mxrPauseBtn = document.getElementById(`mxr-pause-btn`);
-	multimixerJS.mxrRewindBtn = document.getElementById(`mxr-rewind-btn`);
-	multimixerJS.mxrDownloadBtn = document.getElementById(`mxr-download-btn`);
+	multimixerJS.mxrPlayBtn = document.getElementById("mxr-play-btn");
+	multimixerJS.mxrPauseBtn = document.getElementById("mxr-pause-btn");
+	multimixerJS.mxrRewindBtn = document.getElementById("mxr-rewind-btn");
+	multimixerJS.mxrDownloadBtn = document.getElementById("mxr-download-btn");
 	multimixerJS.mxrTransportBtnList = [
 		multimixerJS.mxrPlayBtn,
 		multimixerJS.mxrPauseBtn,
 		multimixerJS.mxrRewindBtn,
 	];
 	multimixerJS.mxrAudioTrackList =
-		document.querySelectorAll(`.mxr-audio-track`);
-	multimixerJS.mxrTimelineSlider.element =
-		document.getElementById(`mxr-timeline-slider`);
+		document.querySelectorAll(".mxr-audio-track");
+	multimixerJS.mxrTimelineSlider.element = document.getElementById(
+		"mxr-timeline-slider"
+	);
 	const timelineSliderData = multimixerJS.mxrTimelineSlider;
-	const timelineSlider = timelineSliderData.element;
+	// const timelineSlider = timelineSliderData.element;
 
-	multimixerJS.mxrIsPlaying = false;
+	audiomanagerJS.audioIsPlaying = false;
 	multimixerJS.mxrIsPaused = false;
 	timelineSliderData.isDragging = false;
 
-	multimixerJS.mxrPauseBtn.classList.add(`inop`);
-	multimixerJS.mxrRewindBtn.classList.add(`inop`);
-
-	function setTransportEnabledX(enabled) {
-		multimixerJS.mxrTransportBtnList.forEach((mxrBtn) => {
-			if (enabled) {
-				mxrBtn.classList.remove(`inop`);
-			} else {
-				mxrBtn.classList.add(`inop`);
-			}
-		});
-	}
+	multimixerJS.mxrPauseBtn.classList.add("inop");
+	multimixerJS.mxrRewindBtn.classList.add("inop");
 
 	function handleStartPlayback() {
 		multimixerJS.startPlayback(); // sets up nodes, starts audio
@@ -1104,94 +1043,95 @@ multimixerJS.initPlaybackBtns = function () {
 		multimixerJS.animateTimeline();
 	}
 
-	multimixerJS.mxrPlayBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	multimixerJS.mxrPlayBtn.addEventListener("click", (event) => {
+		event = eRegistryJS.register(event);
 		// c•onsole.log(`multimixerJS.mxrPlayBtn(`click`, ()`);
-		document.querySelectorAll(`.mxr-dial-container`).forEach((dialcon, i) => {
+		document.querySelectorAll(".mxr-dial-container").forEach((dialcon, i) => {
 			const rect = dialcon.getBoundingClientRect();
 		});
-		document.querySelectorAll(`.mxr-dial`).forEach((dial, i) => {
+		document.querySelectorAll(".mxr-dial").forEach((dial, i) => {
 			const rect = dial.getBoundingClientRect();
 		});
 
-		if (multimixerJS.mxrIsPlaying) {
+		if (audiomanagerJS.audioIsPlaying) {
 			// 🔁 Already playing → stop and reset
-			timelineSliderData.element.classList.remove(`on`);
-			multimixerJS.pauseAudio();
+			timelineSliderData.element.classList.remove("on");
+			multimixerJS.pauseAudio(event);
 			multimixerJS.resetTimeline();
-			multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.add(`inop`);
-			multimixerJS.mxrIsPlaying = false;
+			multimixerJS.mxrPlayBtn.classList.remove("btn-on");
+			multimixerJS.mxrPauseBtn.classList.add("inop");
+			audiomanagerJS.audioIsPlaying = false;
 		} else {
 			// ▶️ Fresh start or resume from pause
 			handleStartPlayback();
-			multimixerJS.mxrPlayBtn.classList.add(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.remove(`inop`);
-			multimixerJS.mxrPauseBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrRewindBtn.classList.remove(`inop`);
-			timelineSliderData.element.classList.add(`on`);
-			multimixerJS.mxrIsPlaying = true;
+			multimixerJS.mxrPlayBtn.classList.add("btn-on");
+			multimixerJS.mxrPauseBtn.classList.remove("inop");
+			multimixerJS.mxrPauseBtn.classList.remove("btn-on");
+			multimixerJS.mxrRewindBtn.classList.remove("inop");
+			timelineSliderData.element.classList.add("on");
+			audiomanagerJS.audioIsPlaying = true;
 		}
 		// qqBtns();
 
 		setTimeout(() => {
-			document.querySelectorAll(`.mxr-dial-container`).forEach((dialcon, i) => {
+			document.querySelectorAll(".mxr-dial-container").forEach((dialcon, i) => {
 				const rect = dialcon.getBoundingClientRect();
 			});
-			document.querySelectorAll(`.mxr-dial`).forEach((dial, i) => {
+			document.querySelectorAll(".mxr-dial").forEach((dial, i) => {
 				const rect = dial.getBoundingClientRect();
 			});
 		}, 100);
 	});
 
-	multimixerJS.mxrPauseBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	multimixerJS.mxrPauseBtn.addEventListener("click", (event) => {
+		event = eRegistryJS.register(event);
+		const audioCtx = audiomanagerJS.getAudioCtx();
 		// c•onsole.log(`multimixerJS.mxrPauseBtn(`click`, ()`);
-		if (multimixerJS.mxrIsPlaying) {
-			const now = multimixerJS.mxrAudioCtx.currentTime;
-			multimixerJS.mxrPauseTime = now - multimixerJS.mxrStartTime;
-			multimixerJS.pauseAudio();
-			multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.add(`btn-on`);
-			multimixerJS.mxrIsPlaying = false;
+		if (audiomanagerJS.audioIsPlaying) {
+			const now = audioCtx.currentTime;
+			audiomanagerJS.mxrPauseTime = now - audiomanagerJS.playStartTime;
+			multimixerJS.pauseAudio(event);
+			multimixerJS.mxrPlayBtn.classList.remove("btn-on");
+			multimixerJS.mxrPauseBtn.classList.add("btn-on");
+			audiomanagerJS.audioIsPlaying = false;
 			multimixerJS.mxrIsPaused = true;
 		} else {
-			multimixerJS.mxrPlayBtn.classList.add(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrIsPlaying = true;
+			multimixerJS.mxrPlayBtn.classList.add("btn-on");
+			multimixerJS.mxrPauseBtn.classList.remove("btn-on");
+			audiomanagerJS.audioIsPlaying = true;
 			multimixerJS.mxrIsPaused = false;
 			handleStartPlayback();
 		}
-		multimixerJS.mxrPauseBtn.classList.remove(`inop`);
+		multimixerJS.mxrPauseBtn.classList.remove("inop");
 		// qqBtns();
 	});
 
-	multimixerJS.mxrRewindBtn.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	multimixerJS.mxrRewindBtn.addEventListener("click", (event) => {
+		eRegistryJS.register(event);
 		// c•onsole.log(`multimixerJS.mxrRewindBtn(`click`, ()`);
 		multimixerJS.resetTimeline();
-		activeBtn = multimixerJS.mxrPauseBtn;
-		restart = false;
-		if (multimixerJS.mxrIsPlaying) {
-			restart = true;
+		multimixerJS.mxrActiveBtn = multimixerJS.mxrPauseBtn;
+		audiomanagerJS.audioRestart = false;
+		if (audiomanagerJS.audioIsPlaying) {
+			audiomanagerJS.audioRestart = true;
 			// Stop any existing sources before restart
 			multimixerJS.pauseAudio();
 		}
-		if (multimixerJS.mxrPlayBtn.classList.contains(`btn-on`)) {
-			activeBtn = multimixerJS.mxrPlayBtn;
+		if (multimixerJS.mxrPlayBtn.classList.contains("btn-on")) {
+			multimixerJS.mxrActiveBtn = multimixerJS.mxrPlayBtn;
 		}
-		if (multimixerJS.mxrPauseBtn.classList.contains(`btn-on`)) {
+		if (multimixerJS.mxrPauseBtn.classList.contains("btn-on")) {
 			timelineSliderData.element.style.left = `${timelineSliderData.offsetLeft}px`;
 		}
 
 		// Briefly light the rewind button
-		multimixerJS.mxrRewindBtn.classList.add(`btn-on`);
+		multimixerJS.mxrRewindBtn.classList.add("btn-on");
 		setTimeout(() => {
-			multimixerJS.mxrRewindBtn.classList.remove(`btn-on`);
-			if (restart) {
+			multimixerJS.mxrRewindBtn.classList.remove("btn-on");
+			if (audiomanagerJS.audioRestart) {
 				handleStartPlayback();
-				activeBtn.classList.add(`btn-on`);
-				timelineSliderData.element.classList.add(`on`);
+				multimixerJS.mxrActiveBtn.classList.add("btn-on");
+				timelineSliderData.element.classList.add("on");
 			}
 		}, 300);
 
@@ -1201,20 +1141,20 @@ multimixerJS.initPlaybackBtns = function () {
 	// Add this to hc-static-js-multimixer.js
 	// Replace the existing download button event listener
 
-	multimixerJS.mxrDownloadBtn.addEventListener(`click`, async (event) => {
-		window.EventRegistry.register(event);
+	multimixerJS.mxrDownloadBtn.addEventListener("click", async (event) => {
+		eRegistryJS.register(event);
 		// c•onsole.log(`multimixerJS.mxrDownloadBtn(`click`, ()`);
 		// Disable all controls during processing
 		multimixerJS.pauseAudio();
-		multimixerJS.mxrDownloadBtn.classList.add(`btn-on`);
-		multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-		multimixerJS.mxrPauseBtn.classList.remove(`btn-on`);
-		multimixerJS.mxrRewindBtn.classList.remove(`btn-on`);
-		multimixerJS.mxrTimelineSlider.element.classList.remove(`on`);
+		multimixerJS.mxrDownloadBtn.classList.add("btn-on");
+		multimixerJS.mxrPlayBtn.classList.remove("btn-on");
+		multimixerJS.mxrPauseBtn.classList.remove("btn-on");
+		multimixerJS.mxrRewindBtn.classList.remove("btn-on");
+		multimixerJS.mxrTimelineSlider.element.classList.remove("on");
 
 		// Disable transport controls
 		multimixerJS.mxrTransportBtnList.forEach((btn) => {
-			btn.classList.add(`inop`);
+			btn.classList.add("inop");
 		});
 
 		try {
@@ -1228,16 +1168,16 @@ multimixerJS.initPlaybackBtns = function () {
 			alert(`Download failed. Please try again.`);
 		} finally {
 			// Re-enable controls
-			multimixerJS.mxrDownloadBtn.classList.remove(`btn-on`);
+			multimixerJS.mxrDownloadBtn.classList.remove("btn-on");
 			multimixerJS.mxrTransportBtnList.forEach((btn) => {
-				btn.classList.remove(`inop`);
+				btn.classList.remove("inop");
 			});
 		}
 	});
 
 	// Create mixed audio buffer based on current settings
 	multimixerJS.createMixedAudio = async function () {
-		const ctx = multimixerJS.mxrAudioCtx;
+		const audioCtx = audiomanagerJS.getAudioCtx();
 
 		// Get the longest track duration
 
@@ -1252,7 +1192,7 @@ multimixerJS.initPlaybackBtns = function () {
 		}
 
 		// Create offline audio context for rendering
-		const sampleRate = ctx.sampleRate;
+		const sampleRate = audioCtx.sampleRate;
 		const frameCount = Math.ceil(maxDuration * sampleRate);
 		const offlineCtx = new OfflineAudioContext(2, frameCount, sampleRate); // Stereo output
 
@@ -1268,12 +1208,12 @@ multimixerJS.initPlaybackBtns = function () {
 
 			// Get current settings from UI
 			const volumeSlider =
-				document.querySelectorAll(`.mxr-volume-slider`)[index];
+				document.querySelectorAll(".mxr-volume-slider")[index];
 			const muteBtn = document.getElementById(`mxr-mute-btn-${index}`);
 			const dialElement = document.getElementById(`mxr-dial-${index}`);
 
 			const volume = volumeSlider ? parseFloat(volumeSlider.value) : 1.0;
-			const isMuted = muteBtn ? muteBtn.classList.contains(`mute`) : false;
+			const isMuted = muteBtn ? muteBtn.classList.contains("mute") : false;
 			const panValue = dialElement
 				? parseFloat(dialElement.dataset.panValue || 0)
 				: 0;
@@ -1311,10 +1251,10 @@ multimixerJS.initPlaybackBtns = function () {
 		const url = URL.createObjectURL(wavBlob);
 
 		// Create download link
-		const downloadLink = document.createElement(`a`);
+		const downloadLink = document.createElement("a");
 		downloadLink.href = url;
 		downloadLink.download = filename;
-		downloadLink.style.display = `none`;
+		downloadLink.style.display = "none";
 
 		// Trigger download
 		document.body.appendChild(downloadLink);
@@ -1343,15 +1283,15 @@ multimixerJS.initPlaybackBtns = function () {
 		let offset = 0;
 
 		// RIFF chunk descriptor
-		writeString(view, offset, `RIFF`);
+		writeString(view, offset, "RIFF");
 		offset += 4;
 		view.setUint32(offset, bufferSize - 8, true);
 		offset += 4; // File size - 8
-		writeString(view, offset, `WAVE`);
+		writeString(view, offset, "WAVE");
 		offset += 4;
 
 		// fmt sub-chunk
-		writeString(view, offset, `fmt `);
+		writeString(view, offset, "fmt ");
 		offset += 4;
 		view.setUint32(offset, 16, true);
 		offset += 4; // Sub-chunk size
@@ -1369,7 +1309,7 @@ multimixerJS.initPlaybackBtns = function () {
 		offset += 2;
 
 		// data sub-chunk
-		writeString(view, offset, `data`);
+		writeString(view, offset, "data");
 		offset += 4;
 		view.setUint32(offset, dataSize, true);
 		offset += 4;
@@ -1390,7 +1330,7 @@ multimixerJS.initPlaybackBtns = function () {
 			}
 		}
 
-		return new Blob([arrayBuffer], { type: `audio/wav` });
+		return new Blob([arrayBuffer], { type: "audio/wav" });
 
 		function writeString(view, offset, string) {
 			for (let i = 0; i < string.length; i++) {
@@ -1407,8 +1347,8 @@ multimixerJS.generateDownloadFilename = function () {
 	const now = new Date();
 	const dateString =
 		String(now.getFullYear() - 2000) +
-		String(now.getMonth() + 1).padStart(2, `0`) +
-		String(now.getDate()).padStart(2, `0`);
+		String(now.getMonth() + 1).padStart(2, "0") +
+		String(now.getDate()).padStart(2, "0");
 
 	// Get the active preset
 	const activePreset = multimixerJS.mxrLastPreset;
@@ -1419,7 +1359,7 @@ multimixerJS.generateDownloadFilename = function () {
 
 	const selectedVoice = multimixerJS.getSelectedVoice();
 	switch (activePreset) {
-		case `stereo`:
+		case "stereo":
 			// Format: Gloria_Soprano_Left_20250101
 			if (selectedVoice) {
 				filename += `_${selectedVoice}_Left_${dateString}`;
@@ -1428,7 +1368,7 @@ multimixerJS.generateDownloadFilename = function () {
 			}
 			break;
 
-		case `partpre`:
+		case "partpre":
 			// Format: Gloria_Soprano_Forward_20250101
 			if (selectedVoice) {
 				filename += `_${selectedVoice}_Predominant_${dateString}`;
@@ -1437,57 +1377,56 @@ multimixerJS.generateDownloadFilename = function () {
 			}
 			break;
 
-		case `init`:
+		case "init":
 		default:
 			// Format: Gloria_CustomMix_20250101
 			filename += `_CustomMix_${dateString}`;
 			break;
 	}
 
-	return filename + `.wav`;
+	return filename + ".wav";
 };
 
 multimixerJS.initTimelineSeekAndDrag = function () {
-	const mxrPlayer = document.getElementById(`mxr-player`);
-	multimixerJS.mxrTimelineSlider.element =
-		document.getElementById(`mxr-timeline-slider`);
+	const mxrPlayer = document.getElementById("mxr-player");
+	multimixerJS.mxrTimelineSlider.element = document.getElementById(
+		"mxr-timeline-slider"
+	);
 
 	//const timelineSliderData = multimixerJS.mxrTimelineSlider;
 	const timelineSlider = multimixerJS.mxrTimelineSlider.element;
 
-	const firstTimeline = document.getElementById(`mxr-timeline-0`);
+	const firstTimeline = document.getElementById("mxr-timeline-0");
 
 	if (!mxrPlayer || !timelineSlider || !firstTimeline) return;
 
-	const timelineContainer = document.getElementsByClassName(
-		`mxr-timeline-container`
-	)[0];
+	// const timelineContainer = document.getElementsByClassName("mxr-timeline-container")[0];
 
 	// if (!timelineContainer) return;
 
 	// Set up mxrPlayer group event listeners
-	mxrPlayer.addEventListener(`pointerdown`, (event) => {
-		window.EventRegistry.register(event);
+	mxrPlayer.addEventListener("pointerdown", (event) => {
+		event = eRegistryJS.register(event);
 		multimixerJS.pointerDownHandler(event);
 	});
-	mxrPlayer.addEventListener(`pointerup`, (event) => {
-		window.EventRegistry.register(event);
+	mxrPlayer.addEventListener("pointerup", (event) => {
+		event = eRegistryJS.register(event);
 		multimixerJS.pointerUpHandler(event);
 	});
 };
 
 multimixerJS.calculateSeek = function (event) {
-	window.EventRegistry.use(event, "multimixerJS.calculateSeek");
-	const mxrPlayer = document.getElementById(`mxr-player`);
+	eRegistryJS.use(event, "multimixerJS.calculateSeek");
+	const mxrPlayer = document.getElementById("mxr-player");
 
 	const timelineSliderData = multimixerJS.mxrTimelineSlider;
 	const timelineSlider = timelineSliderData.element;
-	const firstTimeline = document.getElementById(`mxr-timeline-0`);
+	const firstTimeline = document.getElementById("mxr-timeline-0");
 
 	if (!mxrPlayer || !timelineSlider || !firstTimeline) return;
 
 	const timelineContainer = document.getElementsByClassName(
-		`mxr-timeline-container`
+		"mxr-timeline-container"
 	)[0];
 	if (!timelineContainer) return;
 
@@ -1527,23 +1466,23 @@ multimixerJS.calculateSeek = function (event) {
 };
 
 multimixerJS.getTargetType = function (event) {
-	window.EventRegistry.use(event, "multimixerJS.getTargetType");
+	eRegistryJS.use(event, "multimixerJS.getTargetType");
 	// check the type of event.target
 	const eTarget = `${event.target.id || `no-id`}.${event.target.className}`;
 
-	if (eTarget.includes(`mxr-dial`)) return `dial`;
-	if (eTarget.includes(`mxr-volume-slider`)) return `slider`;
-	if (eTarget.includes(`mxr-mute`)) return `mute`;
+	if (eTarget.includes("mxr-dial")) return "dial";
+	if (eTarget.includes("mxr-volume-slider")) return "slider";
+	if (eTarget.includes("mxr-mute")) return "mute";
 	// otherwise, default is timeline
-	return `timeline`;
+	return "timeline";
 };
 
 multimixerJS.getTrackIndex = function (element) {
 	// bubbles up through heirarchy to find an element with dataset.trackIndex
 	// returns -1 if nothing found
-	trackIndex = -1;
+	let trackIndex = -1;
 	if (element) {
-		if (element.id !== `multimixer`) {
+		if (element.id !== "multimixer") {
 			if (element.dataset.trackIndex) {
 				trackIndex = parseInt(element.dataset.trackIndex);
 			} else {
@@ -1561,14 +1500,14 @@ multimixerJS.showStoredData = function () {};
 // Add this single function to your hc-static-js-multimixer.js file
 
 multimixerJS.isTouchDevice = function () {
-	return `onpointerdown` in window || navigator.maxTouchPoints > 0;
+	return "onpointerdown" in window || navigator.maxTouchPoints > 0;
 };
 
 // Create a visual display for test results
 multimixerJS.showTouchTest = function () {
 	// Create a test display div
-	const testDiv = document.createElement(`div`);
-	testDiv.id = `touch-test-display`;
+	const testDiv = document.createElement("div");
+	testDiv.id = "touch-test-display";
 	testDiv.style.cssText = `
         position: fixed;
         top: 10px;
@@ -1585,7 +1524,7 @@ multimixerJS.showTouchTest = function () {
 
 	// Test results
 	const isTouchDevice = multimixerJS.isTouchDevice();
-	const hasOnpointerdown = `onpointerdown` in window;
+	const hasOnpointerdown = "onpointerdown" in window;
 	const maxTouchPoints = navigator.maxTouchPoints || 0;
 
 	testDiv.innerHTML = `
@@ -1598,13 +1537,13 @@ multimixerJS.showTouchTest = function () {
     `;
 
 	// Add click to hide
-	testDiv.addEventListener(`click`, (event) => {
-		window.EventRegistry.register(event);
+	testDiv.addEventListener("click", (event) => {
+		eRegistryJS.register(event);
 		testDiv.remove();
 	});
 
-	testDiv.addEventListener(`pointerup`, (event) => {
-		window.EventRegistry.register(event);
+	testDiv.addEventListener("pointerup", (event) => {
+		eRegistryJS.register(event);
 		event.preventDefault();
 		testDiv.remove();
 	});
@@ -1612,31 +1551,18 @@ multimixerJS.showTouchTest = function () {
 	// document.body.appendChild(testDiv);
 
 	// Also log to console (in case you can access it)
-	console.log(`🔍 Touch device test:`, isTouchDevice);
-	console.log(`🔍 onpointerdown in window:`, hasOnpointerdown);
-	console.log(`🔍 navigator.maxTouchPoints:`, maxTouchPoints);
+	console.log("🔍 Touch device test:", isTouchDevice);
+	console.log("🔍 onpointerdown in window:", hasOnpointerdown);
+	console.log("🔍 navigator.maxTouchPoints:", maxTouchPoints);
 };
-
-/*
-// SHOW TOUCH TEST
-// Show the test when DOM is ready
-document.addEventListener(`DxOMContentLoaded`, (event) => {
-	xxx(event);
-	c‡onst ev‡entIndex = window.EventRegistry.register(event);
-	multimixerJS.showTouchTest();
-});
-*/
-
-// Prevent Double-Firing Test
-// Replace your testTouchEvents function with this improved version
 
 multimixerJS.testTouchEvents = function () {
 	let touchCount = 0;
 
 	// Create a test button to tap
-	const testButton = document.createElement(`button`);
-	testButton.id = `touch-test-button`;
-	testButton.textContent = `TAP ME (Fixed)`;
+	const testButton = document.createElement("button");
+	testButton.id = "touch-test-button";
+	testButton.textContent = "TAP ME (Fixed)";
 	testButton.style.cssText = `
         position: fixed;
         top: 100px;
@@ -1654,8 +1580,8 @@ multimixerJS.testTouchEvents = function () {
     `;
 
 	// Create display for results
-	const resultDiv = document.createElement(`div`);
-	resultDiv.id = `touch-results`;
+	const resultDiv = document.createElement("div");
+	resultDiv.id = "touch-results";
 	resultDiv.style.cssText = `
         position: fixed;
         top: 160px;
@@ -1684,38 +1610,38 @@ multimixerJS.testTouchEvents = function () {
 
 	// Only use pointerup on touch devices, click on others
 	if (multimixerJS.isTouchDevice()) {
-		console.log(`Using touch events for button`);
+		console.log("Using touch events for button");
 
-		testButton.addEventListener(`pointerup`, (event) => {
-			window.EventRegistry.register(event);
+		testButton.addEventListener("pointerup", (event) => {
+			event = eRegistryJS.register(event);
 			event.preventDefault(); // Prevent click from firing
 			event.stopPropagation(); // Stop event bubbling
-			updateResults(`pointerup`);
+			updateResults("pointerup");
 		});
 
 		// Optional: Add visual feedback on touch start
-		testButton.addEventListener(`pointerdown`, (event) => {
-			window.EventRegistry.register(event);
-			testButton.style.transform = `scale(0.95)`;
+		testButton.addEventListener("pointerdown", (event) => {
+			eRegistryJS.register(event);
+			testButton.style.transform = "scale(0.95)";
 		});
 
-		testButton.addEventListener(`pointerup`, (event) => {
-			window.EventRegistry.register(event);
+		testButton.addEventListener("pointerup", (event) => {
+			eRegistryJS.register(event);
 			setTimeout(() => {
-				testButton.style.transform = `scale(1)`;
+				testButton.style.transform = "scale(1)";
 			}, 100);
 		});
 	} else {
-		console.log(`Using click events for button`);
+		console.log("Using click events for button");
 
-		testButton.addEventListener(`click`, (event) => {
-			window.EventRegistry.register(event);
-			updateResults(`click`);
+		testButton.addEventListener("click", (event) => {
+			eRegistryJS.register(event);
+			updateResults("click");
 		});
 	}
 
 	// Initial display
-	updateResults(`ready`);
+	updateResults("ready");
 
 	document.body.appendChild(testButton);
 	// document.body.appendChild(resultDiv);
@@ -1731,7 +1657,7 @@ multimixerJS.testTouchEvents = function () {
 // Add this to your multimixer code, call it after your existing initialization
 
 multimixerJS.enhancePlayButtonTouch = function () {
-	const playBtn = document.getElementById(`mxr-play-btn`);
+	const playBtn = document.getElementById("mxr-play-btn");
 	if (!playBtn) {
 		console.log(`❌ Play button not found`);
 		return;
@@ -1740,7 +1666,7 @@ multimixerJS.enhancePlayButtonTouch = function () {
 	console.log(`🎯 Enhancing real play button with touch...`);
 
 	// Status display (temporary, for testing)
-	const statusDiv = document.createElement(`div`);
+	const statusDiv = document.createElement("div");
 	statusDiv.style.cssText = `
         position: fixed;
         top: 220px;
@@ -1754,7 +1680,7 @@ multimixerJS.enhancePlayButtonTouch = function () {
         z-index: 10000;
         max-width: 200px;
     `;
-	statusDiv.textContent = `Play button enhanced`;
+	statusDiv.textContent = "Play button enhanced";
 	// document.body.appendChild(statusDiv);
 
 	// Remove after 5 seconds
@@ -1762,41 +1688,41 @@ multimixerJS.enhancePlayButtonTouch = function () {
 
 	// Store the original functionality (from your existing code)
 	const originalPlayAction = () => {
-		console.log(`🎵 Play button activated`);
+		console.log("🎵 Play button activated");
 
-		if (multimixerJS.mxrIsPlaying) {
+		if (audiomanagerJS.audioIsPlaying) {
 			// Stop playing (your existing logic)
-			multimixerJS.mxrTimelineSlider.element.classList.remove(`on`);
+			multimixerJS.mxrTimelineSlider.element.classList.remove("on");
 			multimixerJS.pauseAudio();
 			multimixerJS.resetTimeline();
-			multimixerJS.mxrPlayBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.add(`inop`);
-			multimixerJS.mxrIsPlaying = false;
+			multimixerJS.mxrPlayBtn.classList.remove("btn-on");
+			multimixerJS.mxrPauseBtn.classList.add("inop");
+			audiomanagerJS.audioIsPlaying = false;
 		} else {
 			// Start playing (your existing logic)
 			multimixerJS.startPlayback();
-			multimixerJS.mxrPlayBtn.classList.add(`btn-on`);
-			multimixerJS.mxrPauseBtn.classList.remove(`inop`);
-			multimixerJS.mxrPauseBtn.classList.remove(`btn-on`);
-			multimixerJS.mxrRewindBtn.classList.remove(`inop`);
-			multimixerJS.mxrTimelineSlider.element.classList.add(`on`);
-			multimixerJS.mxrIsPlaying = true;
+			multimixerJS.mxrPlayBtn.classList.add("btn-on");
+			multimixerJS.mxrPauseBtn.classList.remove("inop");
+			multimixerJS.mxrPauseBtn.classList.remove("btn-on");
+			multimixerJS.mxrRewindBtn.classList.remove("inop");
+			multimixerJS.mxrTimelineSlider.element.classList.add("on");
+			audiomanagerJS.audioIsPlaying = true;
 		}
 	};
 
 	// Enhanced button styling for touch
-	playBtn.style.touchAction = `manipulation`;
-	playBtn.style.webkitTapHighlightColor = `rgba(0,0,0,0)`;
+	playBtn.style.touchAction = "manipulation";
+	playBtn.style.webkitTapHighlightColor = "rgba(0,0,0,0)";
 
 	// Remove existing event listeners by cloning the button
 	const newPlayBtn = playBtn.cloneNode(true);
 	playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
 
 	// Also add these CSS properties right after you create newPlayBtn:
-	newPlayBtn.style.webkitUserSelect = `none`;
-	newPlayBtn.style.userSelect = `none`;
-	newPlayBtn.style.webkitTouchCallout = `none`;
-	newPlayBtn.style.touchAction = `manipulation`;
+	newPlayBtn.style.webkitUserSelect = "none";
+	newPlayBtn.style.userSelect = "none";
+	newPlayBtn.style.webkitTouchCallout = "none";
+	newPlayBtn.style.touchAction = "manipulation";
 
 	// Update the reference
 	multimixerJS.mxrPlayBtn = newPlayBtn;
@@ -1809,25 +1735,25 @@ multimixerJS.enhancePlayButtonTouch = function () {
 		// Update your pointerdown handler:
 
 		// Touch start - visual feedback (DON'T prevent default here)
-		newPlayBtn.addEventListener(`pointerdown`, (event) => {
-			window.EventRegistry.register(event);
+		newPlayBtn.addEventListener("pointerdown", (event) => {
+			eRegistryJS.register(event);
 			// Don't prevent default on pointerdown - it breaks pointerup
 			// event.preventDefault(); // Remove this line
 
-			newPlayBtn.style.transform = `scale(0.95)`;
-			newPlayBtn.style.transition = `transform 0.1s`;
+			newPlayBtn.style.transform = "scale(0.95)";
+			newPlayBtn.style.transition = "transform 0.1s";
 		}); // Remove { passive: false } since we're not preventing default
 
 		// Update your pointerup handler to prevent click instead:
 		newPlayBtn.addEventListener(
-			`pointerup`,
+			"pointerup",
 			(event) => {
-				window.EventRegistry.register(event);
+				event = eRegistryJS.register(event);
 				event.preventDefault(); // Prevent click from firing (keep this)
 				event.stopPropagation(); // Keep this too
 
 				// Reset visual feedback
-				newPlayBtn.style.transform = `scale(1)`;
+				newPlayBtn.style.transform = "scale(1)";
 
 				// Execute the play/pause action
 				originalPlayAction();
@@ -1836,21 +1762,21 @@ multimixerJS.enhancePlayButtonTouch = function () {
 		); // Keep this since we are preventing default
 
 		// Keep the CSS properties (these prevent text selection without breaking events):
-		newPlayBtn.style.webkitUserSelect = `none`;
-		newPlayBtn.style.userSelect = `none`;
-		newPlayBtn.style.webkitTouchCallout = `none`;
-		newPlayBtn.style.touchAction = `manipulation`;
+		newPlayBtn.style.webkitUserSelect = "none";
+		newPlayBtn.style.userSelect = "none";
+		newPlayBtn.style.webkitTouchCallout = "none";
+		newPlayBtn.style.touchAction = "manipulation";
 
 		// Touch cancel - reset visual feedback
-		newPlayBtn.addEventListener(`touchcancel`, (event) => {
-			window.EventRegistry.register(event);
-			newPlayBtn.style.transform = `scale(1)`;
+		newPlayBtn.addEventListener("touchcancel", (event) => {
+			eRegistryJS.register(event);
+			newPlayBtn.style.transform = "scale(1)";
 		});
 	} else {
 		console.log(`🖱️ Adding click events to play button`);
 
 		// Desktop - use click
-		newPlayBtn.addEventListener(`click`, originalPlayAction);
+		newPlayBtn.addEventListener("click", originalPlayAction);
 	}
 
 	console.log(`✅ Play button touch enhancement complete`);
@@ -1861,7 +1787,7 @@ multimixerJS.enhancePlayButtonTouch = function () {
 // Call this after your existing multimixer initialization
 // Add this line to test:
 document.addEventListener(`DxOMContentLoaded`, (event) => {
-	c‡onst ev‡entIndex = window.EventRegistry.register(event);
+	c‡onst ev‡entIndex = wi‡ndow.Eve‡ntRegistry.re‡gister(event);
 	// Wait for your existing init to complete
 	setTimeout(() => {
 		if (window.multimixerJS && document.getElementById(`mxr-play-btn`)) {
@@ -1870,3 +1796,61 @@ document.addEventListener(`DxOMContentLoaded`, (event) => {
 	}, 2000); // Wait 2 seconds for existing init
 });
 */
+
+/*
+multimixerJS.initActivePanDialX = function (mxrDial) {
+	const trackIndex = multimixerJS.getTrackIndex(mxrDial);
+	// Set initial dial position based on mxrTrack's panValue
+	const mxrTrack = multimixerJS.mxrTrackArray[trackIndex];
+	const indicator = document.getElementById(".mxr-indicator-" + trackIndex);
+
+	if (indicator && mxrTrack) {
+		// Set initial rotation based on mxrTrack panValue
+		// mxrTrack.dialAngle = mxrTrack.panValue * multimixerJS.mxrMaxPanRadians;
+		mxrTrack.panValue = multimixerJS.calculatePanValue(mxrTrack.dialAngle);
+
+		/* indicator.style.transform = `translate(-50%, -150%) rotate(${angle}rad)`;
+		mxrDial.dataset.panValue = mxrTrack.panValue;
+		
+		multimixerJS.setPanOnIndex(trackIndex, mxrDial.dataset.panValue); * /
+	}
+};
+*/
+// Release pointer capture
+// if (timelineSliderData.element.hasPointerCapture?.(event.pointerId)) {
+// timelineSliderData.element.releasePointerCapture(event.pointerId);
+// }
+
+// if (
+// multimixerJS.mxrIsPaused &&
+// !multimixerJS.mxrPauseBtn.classList.contains(`btn-on`)
+// ) {
+// multimixerJS.startPlayback();
+// multimixerJS.mxrIsPaused = false;
+// multimixerJS.mxrIsPlaying = true;
+// }
+
+/*
+	function setTransportEnabledX(enabled) {
+		multimixerJS.mxrTransportBtnList.forEach((mxrBtn) => {
+			if (enabled) {
+				mxrBtn.classList.remove("inop");
+			} else {
+				mxrBtn.classList.add("inop");
+			}
+		});
+	}
+*/
+
+/*
+// SHOW TOUCH TEST
+// Show the test when DOM is ready
+document.addEventListener(`DxOMContentLoaded`, (event) => {
+	xxx(event);
+	c‡onst ev‡entIndex = w‡indow.E‡ventRegistry.re‡gister(event);
+	multimixerJS.showTouchTest();
+});
+*/
+
+// Prevent Double-Firing Test
+// Replace your testTouchEvents function with this improved version

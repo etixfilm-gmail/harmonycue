@@ -10,6 +10,7 @@ module.exports = {
 		const filePath = path.join(__dirname, `../hc-data/hc-data-multimixer.json`);
 		const data = await fs.readFile(filePath, `utf-8`);
 		const json = JSON.parse(data);
+		console.log(`json:${JSON.stringify(json)}`);
 		return [json.songname, json.mixtracks]; // returns array of track objects
 	},
 	async getVoicePartList() {

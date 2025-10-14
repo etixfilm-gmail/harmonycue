@@ -44,9 +44,10 @@ samplerJS.setupSamplerEvents = function () {
 
 samplerJS.init = async function () {
 	//z•zz();
-	mmm("🎬 Starting samplerJS.init()");
+	// m•mm("🎬 Starting samplerJS.init()");
 	// Optionally call post-injection handlers
 	if (samplerJS?.setupSamplerEvents) samplerJS.setupSamplerEvents();
+	mmm("✅ samplerJS initialized");
 };
 
 {
@@ -368,7 +369,6 @@ samplerJS.init = async function () {
 					this.samplerBtn.style.backgroundImage = `url("/hc-static-images/hc-static-images-btn-blue.webp")`;
 					this.samplerBtn.innerHTML = `<img class="sampler-btn-icon" alt="Play" src="/hc-static-images/hc-static-images-pause-fill.svg"/>`;
 					this.samplerBtn.classList.add(`playing`);
-					this.samplerBtn.classList.add(`playing`);
 					this.animateTimeline();
 					this.updateFrequency();
 				},
@@ -423,11 +423,8 @@ samplerJS.init = async function () {
 		getTimeString(time) {
 			const secs = `${parseInt(`${time % 60}`, 10)}`.padStart(2, `0`);
 			const min = parseInt(`${(time / 60) % 60}`, 10);
-			const timeString =
-				parseInt(`${(time / 60) % 60}`, 10) +
-				`:` +
-				`${parseInt(`${time % 60}`, 10)}`.padStart(2, `0`);
-			// c•onsole.log(
+			const timeString = `${min}:${secs}`;
+			// console.log(
 			// 	`timeString:${timeString} ==> ` + timeString.replaceAll(`0`, `O`)
 			// );
 			return timeString.replaceAll(`0`, `O`);

@@ -9,11 +9,11 @@ const stateJS = (window.stateJS = window.stateJS || {});
 
 // Audio state (global control and unlock)
 stateJS.audio = {
-	isUnlocked: false, // ✅ True if AudioContext is running
-	attemptedUnlock: false, // ✅ Has user attempted unlock gesture?
-	isLocked: true, // Derived, mirrors !isUnlocked
+	// isUnlocked: false, // ✅ True if AudioContext is running
+	// attemptedUnlock: false, // ✅ Has user attempted unlock gesture?
+	// isLocked: true, // Derived, mirrors !isUnlocked
 	contexts: new Map(), // Populated by audioContextDiagnostic
-	lastUnlockEvent: null, // Pointer/keyboard event that triggered unlock
+	// lastUnlockEvent: null, // Pointer/keyboard event that triggered unlock
 };
 
 // UI state (splash animation, DOM readiness)
@@ -23,7 +23,7 @@ stateJS.page = {
 	splashStarted: false,
 	coverImageReady: false,
 	promptRemoved: false,
-	overlayRemoved: false,
+	// overlayRemoved: false,
 };
 
 // Device and platform info (already partially in window.PLATFORM)
@@ -39,8 +39,8 @@ stateJS.device = {
 
 // placeholder init function
 stateJS.init = function () {
-	//z•zz();
-	mmm("🎬 Starting stateJS.init()");
+	// m•mm("🎬 Starting stateJS.init()");
+	mmm("✅ stateJS initialized");
 };
 
 // Debug utility

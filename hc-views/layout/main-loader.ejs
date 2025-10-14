@@ -104,27 +104,18 @@
 		></div>
 
 		<script>
-			// for (const t of ["pointerdown", "pointerup", "click"]) {
-			// 	document
-			// 		.getElementById("console-logs")
-			// 		.addEventListener(t, (e) => mmm(t, e.pointerType || "mouse"));
-			// }
-
 			// Simple debug logger to send messages to mobile display
 			let mmmLog = "";
 			function mmm(msg) {
 				const logDiv = document.getElementById("console-logs");
 				if (!logDiv) return;
 				console.log(">mmm " + logDiv.childElementCount + " " + msg);
-				// Limit total messages for performance
-				// if (logDiv.children.length > 40) logDiv.removeChild(logDiv.firstChild);
 				// Append new log line
 				const line = document.createElement("div");
 				line.textContent = "> " + msg;
 				mmmLog = mmmLog + line.textContent + "\n";
 				logDiv.appendChild(line);
 				logDiv.scrollTop = logDiv.scrollHeight; // Auto-scroll
-				// mmmLogDump();
 			}
 
 			function mmmLogDump() {
@@ -204,6 +195,7 @@
 			}
 		</script>
 
-		<script type="module" src="/hc-static-js/hc-static-js-init.js"></script>
+		<script defer src="/hc-static-js/hc-static-js-eventregistry.js"></script>
+		<script defer src="/hc-static-js/hc-static-js-init.js"></script>
 	</body>
 </html>

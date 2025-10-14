@@ -2,7 +2,7 @@
 
 // hc-static-js-init.js gets loaded by hc-views/layout/main-loader.ejs
 // as a <script> element within the <body>
-console.log(`✅ LOADED hc-static-js-init.js`);
+mmm(`✅ LOADED hc-static-js-init.js`);
 
 // get details for the user's device
 window.PLATFORM = window.PLATFORM || {
@@ -17,8 +17,7 @@ window.PLATFORM = window.PLATFORM || {
 	isNarrow: window.innerWidth <= 768,
 };
 Object.freeze(window.PLATFORM);
-
-console.log(`window.PLATFORM: ${JSON.stringify(window.PLATFORM)}`);
+// c•onsole.log(`window.PLATFORM: ${JSON.stringify(window.PLATFORM)}`);
 // Mobile detection (already set via PLATFORM)
 if (window.PLATFORM.isMobile) {
 	window.initialMobileWidth = document.documentElement.clientWidth;
@@ -31,20 +30,13 @@ if (window.PLATFORM.isMobile) {
 	window.deviceType = "desktop";
 }
 
-// const initJS = (window.initJS = window.initJS || {});
-
-export const initJS = {
-  async firstInit(event) {
-    // 1) Load CSS (ordered)
-    await loadStylesInOrder([
-      '/hc-static-css/hc-static-css-styles.css',
-    ]);
-}
+const initJS = (window.initJS = window.initJS || {});
 
 initJS.initStarted = false;
 initJS.initFinished = false;
 
-initJS.firstInit = async function (event) {
+initJS.firstInit = async function () {
+	// eRegistryJS.use(event, "initJS.firstInit");
 	console.log(`✅ FIRST INIT CALLED`);
 	mmm("🎬 Starting initJS.firstInit()");
 
@@ -64,44 +56,48 @@ initJS.firstInit = async function (event) {
 
 	mmm("✅ initJS.firstInit done");
 	// eReXgistryJS.use(event, "initJS.firstInit");
-	initJS.overseeLoadingAndInit(event);
+	initJS.overseeLoadingAndInit();
 };
 
-initJS.overseeLoadingAndInit = async function (event) {
+initJS.overseeLoadingAndInit = async function () {
 	// z•zz();
-	// eReXgistryJS.use(event, "initJS.overseeLoadingAndInit");
-	// c•onsole.log("🎬 Starting initJS.overseeLoadingAndInit()");
+	console.log("🎬 Starting initJS.overseeLoadingAndInit()");
 	initJS.initStarted = true;
 
 	try {
-		await initJS.injectStylesheetsOrdered(event);
-		await initJS.injectScriptsParallel(event);
-		await initJS.loadDeferredHtmlAndWait(event);
-		await initJS.waitForFullVisualReadiness(event);
+		await initJS.injectStylesheetsOrdered();
+		await initJS.injectScriptsParallel();
+		await initJS.loadDeferredHtmlAndWait();
+		await initJS.waitForFullVisualReadiness();
 	} catch (err) {
 		console.error("💥 Early-stage load/init failed:", err);
 		throw err;
 	}
 
-	try {
-		await Promise.all([
-			// eReXgistryJS.init(), // global event handlers
-			handlersJS.init(), // global event handlers
-			// multimixerJS.init(), // multichannel mixer
-			// contactJS.init(), // contact form
-			// samplerJS.init(), // sample players
-			explainerJS.init(), // hover explainer
-			splashJS.init(), // splash & intro sections
-			lockJS.init(), // audio unlock handlers
-			utilsJS.init(), // utility handlers
-			// add other init functions here
-		]);
-	} catch (err) {
-		console.error("💥 One or more section initializers failed:", err);
-		throw err;
-	}
+	const initList = [
+		{ ns: eRegistryJS }, // global registry first
+		{ ns: handlersJS }, // global handlers
+		{
+			ns: multimixerJS, // needs data
+			ready: () =>
+				multimixerJS.trackData && Array.isArray(multimixerJS.trackData[1]),
+		},
+		{ ns: samplerJS }, // sample players
+		{ ns: contactJS }, // contact form
+		{ ns: explainerJS }, // hover explainer
+		{ ns: splashJS }, // splash & intro
+		{ ns: lockJS }, // audio unlock
+		{ ns: audiomanagerJS }, // audio manager
+		{ ns: utilsJS }, // utilities
+	];
 
-	initJS.updateComponentSizeVars(event);
+	const results = await Promise.all(
+		initList.map(({ ns, ready }) => utilsJS.safeInit(ns, ready))
+	);
+
+	console.log("Init results:", results);
+
+	initJS.updateComponentSizeVars();
 
 	// Force one layout pass
 	void document.body.offsetHeight;
@@ -121,7 +117,7 @@ initJS.overseeLoadingAndInit = async function (event) {
 };
 
 // Utility function to inject a stylesheet
-initJS.injectStylesheetsOrdered = async function (event) {
+initJS.injectStylesheetsOrdered = async function () {
 	// z•zz();
 	// eReXgistryJS.use(event, "initJS.injectStylesheetsOrdered");
 	// c•onsole.log("🎬 Starting initJS.injectStylesheetsOrdered()");
@@ -148,7 +144,7 @@ initJS.injectStylesheetsOrdered = async function (event) {
 	});
 };
 
-initJS.injectScriptsParallel = async function (event) {
+initJS.injectScriptsParallel = async function () {
 	// z•zz();
 	// eReXgistryJS.use(event, "initJS.injectScriptsParallel");
 	// c•onsole.log("🎬 Starting initJS.injectScriptsParallel()");
@@ -160,6 +156,7 @@ initJS.injectScriptsParallel = async function (event) {
 		`/hc-static-js/hc-static-js-state.js`,
 		`/hc-static-js/hc-static-js-handlers.js`,
 		`/hc-static-js/hc-static-js-scripts.js`,
+		`/hc-static-js/hc-static-js-audiomanager.js`,
 		`/hc-static-js/hc-static-js-contact.js`,
 		`/hc-static-js/hc-static-js-explainer.js`,
 		`/hc-static-js/hc-static-js-multimixer.js`,
@@ -172,7 +169,7 @@ initJS.injectScriptsParallel = async function (event) {
 			const script = document.createElement(`script`);
 			script.src = src;
 			script.onload = () => {
-				// c•onsole.log(`✅ LOADED: ${src}`);
+				// console.log(`✅ LOADED: ${src}`);
 				resolve();
 			};
 			script.onerror = () => {
@@ -188,7 +185,7 @@ initJS.injectScriptsParallel = async function (event) {
 	return Promise.all(promises); // Resolves when ALL are loaded
 };
 
-initJS.loadDeferredHtmlAndWait = async function (event) {
+initJS.loadDeferredHtmlAndWait = async function () {
 	// z•zz();
 	// eReXgistryJS.use(event, "initJS.loadDeferredHtmlAndWait");
 	// c•onsole.log("🎬 Starting initJS.loadDeferredHtmlAndWait()");
@@ -204,6 +201,7 @@ initJS.loadDeferredHtmlAndWait = async function (event) {
 		const container = document.createElement(`div`);
 		container.innerHTML = html;
 		document.body.appendChild(container);
+		utilsJS.runInlineScripts(container);
 
 		// c•onsole.log("✅ initJS.loadDeferredHtmlAndWait done");
 		return "✅ initJS.loadDeferredHtmlAndWait done";
@@ -213,7 +211,7 @@ initJS.loadDeferredHtmlAndWait = async function (event) {
 	}
 };
 
-initJS.waitForFullVisualReadiness = async function (event) {
+initJS.waitForFullVisualReadiness = async function () {
 	// z•zz();
 	// eReXgistryJS.use?.(event, "initJS.waitForFullVisualReadiness");
 	// c•onsole.log("🎬 Starting initJS.waitForFullVisualReadiness()");
@@ -233,7 +231,7 @@ initJS.waitForFullVisualReadiness = async function (event) {
 		} else {
 			await new Promise((resolve) => {
 				document.addEventListener("readystatechange", function onReady() {
-					// if (!e•vent.index) event = eRegistryJS.register(event);
+					// if (!event.index) event = eRegistryJS.register(event);
 					if (document.readyState === "complete") {
 						document.removeEventListener("readystatechange", onReady);
 						// c•onsole.log("✅ document.readyState reached 'complete'");
@@ -290,19 +288,6 @@ initJS.waitForFullVisualReadiness = async function (event) {
 		// c•onsole.log("🟢 All readiness checks passed:", checksPassed);
 
 		window.area = document.getElementById("audio-hover-area");
-
-		["pointerdown", "pointerup", "pointerenter", "pointerleave"].forEach(
-			(type) => {
-				window.area.addEventListener(type, (event) => {
-					// if (!e•vent.index) event = eRegistryJS.register(event);
-					mmm(`🧪 ${type},
-						time: ${performance.now()},
-						pointerType: ${event.pointerType},
-						inside: ${explainerJS.isInsideHoverArea(event)},
-						isPlaying: ${explainerJS.state.isPlaying},`);
-				});
-			}
-		);
 
 		return true;
 	} catch (err) {
@@ -452,29 +437,94 @@ window.addEventListener(`resize`, () => {
 	// c•onsole.log(`headerHeight: ${headerStyles.getPropertyValue(`height`)}, headerPadBottom: ${headerStyles.getPropertyValue(`padding-bottom`)}`);
 });
 
-window.addEventListener(`DOMContentLoaded`, (event) => {
-	console.log("✅ PAGE LOADED, WINDOW LISTENER, event: ", event);
-	initJS.firstInit(event);
-});
-
-window.addEventListener(`loadX`, (event) => {
-	const fnName = "use";
-	const timeout = 5000;
-	const interval = 50;
-	const startTime = Date.now();
-
-	// Wait for the function to become available
-	while (typeof eRegistryJS[fnName] !== "function") {
-		if (Date.now() - startTime > timeout) {
-			console.error(`❌ Timeout: ${fnName} not available after ${timeout}ms`);
-			throw new Error(`Function ${fnName} not available`);
-		}
-		new Promise((resolve) => setTimeout(resolve, interval));
+// Run firstInit as soon as the DOM is parsed.
+// If the DOM is already parsed (common with <script defer>), start immediately.
+(function () {
+	function startInit(eventType) {
+		console.log(
+			`✅ startInit(eventType:${eventType}) — starting initJS.firstInit`
+		);
+		initJS.firstInit();
 	}
 
-	console.log(`🟢 ${fnName} is ready, executing...`);
+	if (document.readyState === "loading") {
+		document.addEventListener(
+			"DOMContentLoaded",
+			() => startInit("DOMContentLoaded"),
+			{ once: true }
+		);
+	} else {
+		// DOM already parsed; safe to start now
+		startInit("defer-ready");
+	}
+})();
 
-	if (!event.index) event = eRegistryJS.register(event);
-	console.log("✅ PAGE LOADED, WINDOW LISTENER, event: ", event);
-	initJS.firstInit(event);
-});
+// catch duplicates
+// === Probe: log duplicate pointer/touch/mouse listener registrations (DEV) ===
+/*
+(() => {
+	if (window.__listenerDedupeProbeInstalled_v2) return;
+	window.__listenerDedupeProbeInstalled_v2 = true;
+
+	const origAdd = EventTarget.prototype.addEventListener;
+	// target -> type -> (listener -> (optKey -> count))
+	const reg = new WeakMap();
+
+	function getCapture(options) {
+		return typeof options === "boolean"
+			? options
+			: !!(options && options.capture);
+	}
+
+	EventTarget.prototype.addEventListener = function (type, listener, options) {
+		if (/^(pointer|touch|mouse)/.test(type) && typeof listener === "function") {
+			let byTypeMap = reg.get(this);
+			if (!byTypeMap) {
+				byTypeMap = new Map();
+				reg.set(this, byTypeMap);
+			}
+
+			let byListenerMap = byTypeMap.get(type);
+			if (!byListenerMap) {
+				byListenerMap = new WeakMap();
+				byTypeMap.set(type, byListenerMap);
+			}
+
+			let byOptMap = byListenerMap.get(listener);
+			if (!byOptMap) {
+				byOptMap = new Map();
+				byListenerMap.set(listener, byOptMap);
+			}
+
+			const capture = getCapture(options);
+			const optKey = capture ? "capture" : "bubble";
+
+			const prev = byOptMap.get(optKey) || 0;
+			byOptMap.set(optKey, prev + 1);
+
+			if (prev >= 1) {
+				console.warn(
+					`⚠️ Duplicate listener x${prev + 1} → ${type} [${listener.name || "anon"} | ${optKey}]`,
+					this
+				);
+				console.trace("↪︎ duplicate added here");
+			}
+		}
+		return origAdd.call(this, type, listener, options);
+	}; 
+})(); 
+*/
+
+/*
+		["pointerdown", "pointerup"].forEach((type) => {
+			window.area.addEventListener(type, (event) => {
+				// if (!e•vent.index) event = eRegistryJS.register(event);
+				mmm(`🧪 ${type},
+						Event from audio-hover-area = window.area
+						time: ${performance.now()},
+						pointerType: ${event.pointerType},
+						inside: ${explainerJS.isInsideHoverArea(event)},
+						isPlaying: ${explainerJS.state.isPlaying},`);
+			});
+		});
+		*/

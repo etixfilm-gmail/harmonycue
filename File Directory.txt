@@ -1,9 +1,11 @@
-
-hc-test-deploy02
+hc-test-deploy03
     |----hc-data
           |----hc-data-multimixer.json
           |----hc-data-sampler.json
           |----hc-data-splash.json
+    |----hc-docs
+          |----AI Communication Style
+          |----namespace-api.md
     |----hc-routes
           |----hc-routes-index.js
     |----hc-services
@@ -77,12 +79,13 @@ hc-test-deploy02
                 |----hc-static-js-explainer.js
                 |----hc-static-js-handlers.js
                 |----hc-static-js-init.js
-                |----hc-static-js-lazyloader.js
+                |----REMOVED hc-static-js-lazyloader.js
                 |----hc-static-js-lock.js
                 |----hc-static-js-multimixer.js
                 |----hc-static-js-sampler.js
                 |----hc-static-js-scripts.js
                 |----hc-static-js-splash.js
+                |----hc-static-js-state.js
                 |----hc-static-js-utils.js
           |----hc-static-media
                 |----A Son of the Sea (all parts) Excerpt.mp3
@@ -128,7 +131,7 @@ hc-test-deploy02
                 |----intro.ejs
                 |----multimixer.ejs
                 |----sampler.ejs
-                |----splash-test.ejs
+                |----REMOVED splash-test.ejs
                 |----splash.ejs
           |----partials
                 |----footer.ejs
@@ -360,11 +363,10 @@ hc-test-deploy02
           |----which
           |----word-wrap
           |----yocto-queue
-    |----.eslintignore
-    |----.eslintrc.json
-    |----.prettierignore
-    |----.prettierrc
+    |----.env
+    |----eslint.config.mjs
+    |----File Directory.txt
     |----package-lock.json
     |----package.json
-    |----sandbox.html
+    |----REMOVED sandbox.html
     |----server.js

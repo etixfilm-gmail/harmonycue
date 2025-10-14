@@ -1,11 +1,17 @@
 // hc-static-js-eventregistry.js gets loaded by hc-views/layout/main-loader.ejs
 // as a <script> element within the <body>
-console.log(`✅ LOADED hc-static-js-eventregistry.js`);
+mmm(`✅ LOADED hc-static-js-eventregistry.js`);
 
 const eRegistryJS = (window.eRegistryJS = window.eRegistryJS || {});
 
+// Back-compat global alias
+// Prefer `eRegistryJS`, but allow callers that use `eventRegistryJS` to work.
+// This does not overwrite an existing different object if one was already set.
+window.eventRegistryJS = window.eventRegistryJS || window.eRegistryJS;
+
 eRegistryJS.init = async function () {
-	mmm("🎬 Starting eRegistryJS.init()");
+	// m•mm("🎬 Starting eRegistryJS.init()");
+	mmm("✅ eRegistryJS initialized");
 };
 
 eRegistryJS.events = [];
@@ -14,63 +20,85 @@ eRegistryJS.nextIndex = 0;
 // 📝 Register a new event (called once per event)
 eRegistryJS.register = function (event) {
 	// Check if this event is already registered
-	console.log("register event:", event);
-	if (!event.index) {
-		console.log(`NO INDEX, NEW EVENT`);
-	} else {
+	// c•onsole.log("register event:", event);
+
+	if (!event.timeStamp) {
+		console.log(`⚠️ no event.timeStamp`);
+	}
+
+	if (event.passkey) {
+		console.log(`⚠️ EVENT ALREADY REGISTERED`);
 		return event;
 	}
+
+	let newPasskey;
+	if (event.detail?.customPasskey) {
+		console.log(`⚠️ CUSTOM EVENT RECEIVED `);
+		newPasskey = event.detail.customPasskey;
+	} else {
+		newPasskey = eRegistryJS._passkeyFor(event);
+	}
+
+	const existingEntry = eRegistryJS.findByPasskey(newPasskey);
+	if (existingEntry) {
+		console.log(`⚠️ IGNORING DUPLICATE PASSKEY`);
+		return existingEntry;
+	}
+
+	const pointerType = event.pointerType || event.detail?.pointerType || "none";
+	const pointerId = event.pointerId || event.detail?.pointerId || "none";
+	// c•onsole.log(`event?.clientX:${event?.clientX} || event.detail?.x:${event.detail?.x} = ${event?.clientX || event.detail?.x}`);
+	const hasValidCoordinates = utilsJS.hasValidCoordinates(event);
 
 	// Create new entry
 	const entry = {
 		index: eRegistryJS.nextIndex++,
 		eventReference: event,
-		key: eRegistryJS._keyFor(event), // <-- store key
+		target: event.target,
+		passkey: newPasskey,
 		useCount: 0,
 		type: event.type,
-		pointerType: event.pointerType,
+		pointerType: pointerType,
+		pointerId: pointerId,
 		timeStamp: event.timeStamp,
-		pointerId: event.pointerId,
+		hasValidCoordinates: hasValidCoordinates,
+		clientX: event.clientX,
+		clientY: event.clientY,
 		handlers: [],
-		registeredAt: Date.now(),
+		registeredAt: Math.round(performance.now()),
 	};
+
+	// c•onsole.log("New Entry: ", entry);
 
 	eRegistryJS.events.push(entry);
 	mmm(
-		`📋 Registered [Event:${entry.index}] ${entry.type}|${entry.pointerType} key:${entry.key}`
+		`📋 Registered [Event:${entry.index}] ${entry.type}|${entry.pointerType} passkey:${entry.passkey}`
 	);
 	return entry;
 };
 
 // 📈 Increment use count (called by each handler)
-eRegistryJS.use = function (event, handlerName = "unknown") {
-	console.log(
-		`✅✅✅ use(event.type:${event.type}; handlerName:${handlerName})`
-	);
-	if (!event.index) event = eRegistryJS.register(event);
-	if (!event.index) console.log(`Why no new event.index?`);
-	console.log("✅✅✅ use event:", event);
+eRegistryJS.use = function (incomingEvent, handlerName = "unknown") {
+	// c•onsole.log(`✅✅✅ incomingEvent.passkey: ${incomingEvent.passkey || "none"}`);
+	let useEvent = incomingEvent;
+	if (!incomingEvent.passkey) useEvent = eRegistryJS.register(incomingEvent);
 
-	if (event.type.includes("move") && explainerJS.state.isMoving) {
+	if (!useEvent.passkey) {
+		console.log(`⚠️ Event registry failed: No passkey.`);
+		return;
+	}
+
+	/*
+	if (useEvent.type.includes("move") && explainerJS.state.isMoving) {
 		if (explainerJS?.state?.isMoving) {
 			explainerJS.state.isMoving = false;
 			mmm(`✅ set explainerJS.state.isMoving to false.`);
 		}
-		return event;
+		return useEvent;
 	}
+	*/
 
-	console.log(
-		`event.type:${event.type} === "hc:audio-unlocked"? ${event.type === "hc:audio-unlocked"}`
-	);
-	if (event.type === "hc:audio-unlocked") {
-		console.log(`event.type:${event.index} event.key:${event.key}`);
-	}
-	let entry;
-	if (event.type === "hc:audio-unlocked") {
-		entry = eRegistryJS.findByKey(event.detail.customKey);
-	} else {
-		entry = eRegistryJS.findByKey(event.key);
-	}
+	let entry = eRegistryJS.findByPasskey(useEvent.passkey);
 
 	// c•onsole.log("entry:", entry);
 	if (entry.index >= 0) {
@@ -83,40 +111,37 @@ eRegistryJS.use = function (event, handlerName = "unknown") {
 			`📊 [Event:${entry.index}] ${entry.type}|${entry.pointerType}: used by ${handlerName} (total uses: ${entry.useCount})`
 		);
 		return entry;
-		// return entry.index;
 	} else {
-		console.warn("⚠️ Tried to use unregistered event:", event);
+		console.warn("⚠️ Tried to use unregistered event:", useEvent);
 		return null;
 	}
-	// }
 };
 
 // 🔍 Search functions
 eRegistryJS.findByReference = function (eventRef) {
 	// z•zz();
-	// c•onsole.log("findByReference eventRef:", eventRef);
-	console.log("findByReference called with:", typeof eventRef, eventRef);
-
-	if (eventRef.key) {
-		mmm(`❌ skipping duplicate`);
+	if (eventRef.passkey) {
+		mmm(`⚠️ skipping duplicate`);
 		return eventRef;
 	}
-	return { index: -1, type: "none", pointerType: "none" };
+	return { index: null, type: "none", pointerType: "none" };
 };
 
-// 🔑 Make a stable key for an event (type + pointer + target + coarse timestamp)
-eRegistryJS._keyFor = function (event) {
+// 🔑 Make a stable passkey for an event (type + pointer + target + coarse timestamp)
+eRegistryJS._passkeyFor = function (event) {
+	// c•onsole.log("eRegistryJS._passkeyFor: ", event);
 	if (!event) return "";
-	if (!event.detail) {
+	if (event?.detail?.customPasskey) {
+		return event.detail.customPasskey;
+	}
+	if (!event.passkey) {
 		const type = event.type || "unknown";
 		const pid = event.pointerId ?? "";
 		const tgt = event.currentTarget?.id || event.target?.id || "";
 		const ts =
 			typeof event.timeStamp === "number" ? Math.round(event.timeStamp) : 0;
-		console.log(`>>>>>>>>> new key ${type}|${pid}|${tgt}|${ts}`);
+		// c•onsole.log(`>>>>>>>>> new passkey ${type}|${pid}|${tgt}|${ts}`);
 		return `${type}|${pid}|${tgt}|${ts}`;
-	} else {
-		return event.detail.customKey;
 	}
 };
 
@@ -134,9 +159,8 @@ eRegistryJS.findByIndex = function (index) {
 	return eRegistryJS.events.find((e) => e.index === index);
 };
 
-eRegistryJS.findByKey = function (key) {
-	// c•onsole.log(`findByKey(key:${key})`);
-	return eRegistryJS.events.find((e) => e.key === key);
+eRegistryJS.findByPasskey = function (passkey) {
+	return eRegistryJS.events.find((e) => e.passkey === passkey);
 };
 
 eRegistryJS.findByType = function (eventType) {
@@ -181,8 +205,8 @@ eRegistryJS.getStats = function () {
 eRegistryJS.getTypeBreakdown = function () {
 	const breakdown = {};
 	eRegistryJS.events.forEach((entry) => {
-		const key = `${entry.type}/${entry.pointerType || "none"}`;
-		breakdown[key] = (breakdown[key] || 0) + 1;
+		const passkey = `${entry.type}/${entry.pointerType || "none"}`;
+		breakdown[passkey] = (breakdown[passkey] || 0) + 1;
 	});
 	return breakdown;
 };
@@ -194,12 +218,12 @@ eRegistryJS.clear = function () {
 	// c•onsole.log("🧹 Event registry cleared");
 };
 
-// 📋 Display functions
+// 📋 Display event registry
 eRegistryJS.logAll = function () {
 	console.table(
 		eRegistryJS.events.map((entry) => ({
 			index: entry.index,
-			key: entry.key,
+			passkey: entry.passkey,
 			type: entry.type,
 			pointerType: entry.pointerType,
 			useCount: entry.useCount,
@@ -221,6 +245,6 @@ eRegistryJS.logEvent = function (index) {
 			reference: entry.eventReference,
 		});
 	} else {
-		// c•onsole.log(`❌ [Event:${index} not found`);
+		// c•onsole.log(`⚠️ [Event:${index} not found`);
 	}
 };

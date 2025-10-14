@@ -5,8 +5,9 @@
 
 <!-- prettier-ignore -->
 <script>
-	const multimixerJS = window.multimixerJS = window.multimixerJS || {};
-	multimixerJS.trackData = <%- JSON.stringify(trackData) %>;
+    window.multimixerJS = window.multimixerJS || {};
+    multimixerJS.trackData     = <%- JSON.stringify(trackData) %>;
+    multimixerJS.mxrTracksList = <%- JSON.stringify(mxrTracksList) %>;
     // Store the data for later use
 </script>
 
@@ -112,3 +113,10 @@
 	</div>
 	<div class="pb-4"></div>
 </section>
+
+<script>
+  window.multimixerJS = window.multimixerJS || {};
+  multimixerJS.trackData     = <%- JSON.stringify(trackData) %>;
+  multimixerJS.mxrTracksList = <%- JSON.stringify(mxrTracksList) %>;
+</script>
+

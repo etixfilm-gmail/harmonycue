@@ -8,7 +8,7 @@ const handlersJS = (window.handlersJS = window.handlersJS || {});
 
 handlersJS.init = async function () {
 	//z•zz();
-	mmm("🎬 Starting handlersJS.init()");
+	// m•mm("🎬 Starting handlersJS.init()");
 
 	// Set size vars AFTER deferred DOM is present
 	// initJS.updateComponentSizeVars();
@@ -24,6 +24,7 @@ handlersJS.init = async function () {
 	}
 	setTimeout(() => window.scrollTo(0, 0), 10);
 
+	mmm("✅ handlersJS initialized");
 	return true;
 };
 
@@ -80,10 +81,10 @@ handlersJS.startHoverInteraction = function (event) {
 	const isTouchEvent =
 		event.pointerType === `touch` || event.type.includes(`touch`);
 	mmm(
-		`handlersJS.startHoverInteraction stateJS.audio.isUnlocked:${stateJS.audio.isUnlocked} ✅`
+		`handlersJS.startHoverInteraction lockJS.audioIsUnlocked:${lockJS.audioIsUnlocked} ✅`
 	);
 	console.log(`isTouchEvent:${isTouchEvent}`);
-	if (!stateJS.audio.isUnlocked) return;
+	if (!lockJS.audioIsUnlocked) return;
 
 	explainerJS.isHovering = true;
 	explainerJS.pointerEnterTime = performance.now();
@@ -131,8 +132,8 @@ handlersJS.startHoverInteraction = function (event) {
 	console.log(
 		`explainerJS.isAudioContextUnlocked():${explainerJS.isAudioContextUnlocked()}`
 	);
-	console.log(`stateJS.audio.isUnlocked:${stateJS.audio.isUnlocked}`);
-	if (!explainerJS.isPlaying && stateJS.audio.isUnlocked) {
+	console.log(`lockJS.audioIsUnlocked:${lockJS.audioIsUnlocked}`);
+	if (!explainerJS.isPlaying && lockJS.audioIsUnlocked) {
 		// m•mm(`explainerJS.hoverAudioState:${explainerJS.hoverAudioState}`);
 		if (explainerJS.hoverAudioState === `suspended`) {
 			explainerJS.ctxClockResume().then(() => {
@@ -253,9 +254,9 @@ handlersJS.explainerLeave = function () {
 handlersJS.startAudioWithPan = function (event) {
 	eRegistryJS.use(event, "handlersJS.startAudioWithPan");
 	mmm(
-		`handlersJS.startAudioWithPan stateJS.audio.isUnlocked:${stateJS.audio.isUnlocked} ✅`
+		`handlersJS.startAudioWithPan lockJS.audioIsUnlocked:${lockJS.audioIsUnlocked} ✅`
 	);
-	if (!stateJS.audio.isUnlocked) return;
+	if (!lockJS.audioIsUnlocked) return;
 
 	explainerJS.isHovering = true;
 	explainerJS.pointerEnterTime = performance.now();
@@ -281,9 +282,9 @@ handlersJS.startAudioWithPan = function (event) {
 
 	// Start playback logic
 	mmm(
-		`handlersJS.startAudioWithPan 2 stateJS.audio.isUnlocked:${stateJS.audio.isUnlocked} ✅`
+		`handlersJS.startAudioWithPan 2 lockJS.audioIsUnlocked:${lockJS.audioIsUnlocked} ✅`
 	);
-	if (!explainerJS.isPlaying && stateJS.audio.isUnlocked) {
+	if (!explainerJS.isPlaying && lockJS.audioIsUnlocked) {
 		if (explainerJS.hoverAudioState === "suspended") {
 			explainerJS.ctxClockResume().then(() => {
 				if (explainerJS.isPaused) {
@@ -375,6 +376,63 @@ handlersJS.updateExplainerPan = function (event) {
 	explainerJS.rightGain.gain.setTargetAtTime(targetRight, now, 0.01);
 
 	// mmm(`🔈 Stereo pan: x=${x}, L=${targetLeft.toFixed(2)}, R=${targetRight.toFixed(2)}`);
+};
+
+handlersJS.hoverPointerEnter = function (event) {
+	if (event.pointerType === "touch") return; // ignore enter from touch
+
+	utilsJS.waitForValue(() => stateJS?.audio?.lastUnlockEvent, {
+		predicate: (v) => v && Number.isFinite(v.x) && Number.isFinite(v.y),
+		timeout: 4000,
+	});
+	const unlockEvent = stateJS.audio.lastUnlockEvent;
+
+	const justUnlocked =
+		unlockEvent && event.timeStamp - (unlockEvent.timeStamp || 0) < 250; // same clock
+	// c•onsole.log(`justUnlocked:${justUnlocked} = thisEvent.timeStamp:${thisEvent.timeStamp} - unlockEvent.timeStamp:${unlockEvent.timeStamp} = ${thisEvent.timeStamp} - ${unlockEvent.timeStamp} = ${event.timeStamp - (unlockEvent.timeStamp || 0)} < 250?`);
+
+	if (justUnlocked) return;
+	if (!event.passkey) {
+		if (event.pointerType !== "touch") {
+			if (!event.passkey) event = eRegistryJS.register(event);
+			explainerJS.onEnter(event);
+		}
+	}
+};
+
+handlersJS.hoverPointerLeave = function (event) {
+	if (event.pointerType === "touch") return; // ignore leave from touch
+	if (!event.passkey) event = eRegistryJS.register(event);
+	explainerJS.state.isMoving = false;
+	explainerJS.onLeave(event);
+};
+
+handlersJS.hoverPointerMove = function (event) {
+	if (!explainerJS.state.isPlaying) return; // if audio isn't playing, ignore event
+	if (!explainerJS.state.isMoving) {
+		// if it's not already moving, register
+		if (!event.passkey) event = eRegistryJS.register(event);
+		explainerJS.state.isMoving = true;
+	}
+	explainerJS.onMove(event);
+};
+
+handlersJS.hoverPointerMove = function (event) {
+	// console.log("event:", event);
+	if (!explainerJS.isInsideHoverArea(event)) return;
+	// if (eRegistryJS.register(event)) {
+	explainerJS.onDown(event);
+	// }
+};
+
+handlersJS.hoverPointerMove = function (event) {
+	if (!explainerJS.isInsideHoverArea(event)) {
+		console.log(`${event.target.id} is not inside hoverArea`);
+		return;
+	}
+	// if (eRegistryJS.register(event)) {
+	explainerJS.onUp(event);
+	// }
 };
 
 //                                                           //

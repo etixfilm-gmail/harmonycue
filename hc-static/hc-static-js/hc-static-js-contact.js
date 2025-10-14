@@ -6,9 +6,10 @@ const contactJS = (window.contactJS = window.contactJS || {});
 
 contactJS.contactFormReady = false;
 
-contactJS.init = function () {
+contactJS.init = async function () {
 	//z•zz(); Placeholder function
-	mmm("🎬 contactJS.init() starting");
+	// m•mm("🎬 Starting contactJS.init()");
+	mmm("✅ contactJS initialized");
 };
 
 /*

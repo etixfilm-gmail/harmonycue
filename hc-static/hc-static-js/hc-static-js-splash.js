@@ -17,6 +17,10 @@ splashJS.splashStarted = false;
 splashJS.audioPrompt = null;
 splashJS.promptRemoved = false;
 
+// --- Finish subscription state (new) ---
+splashJS._finishCallbacks = splashJS._finishCallbacks || [];
+splashJS._finished = splashJS._finished || false;
+
 splashJS.startSplashAnimation = async function () {
 	// z•zz();
 	mmm("🎬 splashJS.startSplashAnimation() starting");
@@ -48,10 +52,10 @@ splashJS.startSplashAnimation = async function () {
 			headerContents.classList.add(`show`);
 			requestAnimationFrame(() => {
 				requestAnimationFrame(() => {
-					splashJS.coverImage.classList.add(`cover-fading`);
+					splashJS.coverImage?.classList?.add(`cover-fading`);
 					setTimeout(() => {
-						splashPad.classList.add(`animate-padding`);
-						splashTextLogo.classList.add(`logo-drop`);
+						splashPad?.classList?.add(`animate-padding`);
+						splashTextLogo?.classList?.add(`logo-drop`);
 					}, 300);
 				});
 			});
@@ -84,15 +88,42 @@ splashJS.startSplashAnimation = async function () {
 				document.documentElement.classList.remove(`scroll-lock`);
 				document.body.classList.remove(`scroll-lock`);
 			}, 1200);
+
+			// Mark finished and drain callbacks (new)
+			try {
+				splashJS._finished = true;
+				const q = (splashJS._finishCallbacks || []).splice(0);
+				for (const cb of q) {
+					try {
+						cb?.();
+					} catch (err) {
+						console.error("splashJS.onFinish cb failed:", err);
+					}
+				}
+				// Fire an optional global event for listeners that prefer events
+				document.dispatchEvent(
+					new CustomEvent("hc:splash-finished", {
+						bubbles: true,
+						composed: true,
+						detail: { time: performance.now() },
+					})
+				);
+			} catch (err) {
+				console.warn("splash finish callback drain failed:", err);
+			}
 			resolve();
 		}
 
 		splashJS.coverImage.addEventListener(
 			"animationend",
 			(event) => {
-				if (!event.index) event = eRegistryJS.register(event);
+				try {
+					event = window.eRegistryJS?.register(event) || event;
+				} catch {}
 				console.log("✅ Animation finished (animationend)");
-				handlersJS.removeCoverImage(event);
+				try {
+					window.handlersJS?.removeCoverImage?.(event);
+				} catch {}
 				cleanup();
 			},
 			{ once: true }
@@ -106,6 +137,28 @@ splashJS.startSplashAnimation = async function () {
 			}
 		}, 1500);
 	});
+};
+
+/**
+ * Public adapter to subscribe to "splash finished".
+ * - If splash already finished, runs `callback` on next tick.
+ * - Otherwise queues it until `startSplashAnimation` completes its cleanup.
+ */
+splashJS.onFinish = function (callback) {
+	if (typeof callback !== "function") return false;
+	if (splashJS._finished) {
+		// run async to keep behavior consistent
+		setTimeout(() => {
+			try {
+				callback();
+			} catch (e) {
+				console.error(e);
+			}
+		}, 0);
+		return true;
+	}
+	splashJS._finishCallbacks.push(callback);
+	return true;
 };
 
 splashJS.initSplashSequence = async function () {
@@ -143,7 +196,7 @@ splashJS.initSplashSequence = async function () {
 
 splashJS.init = async function () {
 	// z•zz();
-	mmm("🎬 Starting splashJS.init()");
+	// m•mm("🎬 Starting splashJS.init()");
 
 	try {
 		splashJS.coverImage = document.getElementById("cover-image");
@@ -164,6 +217,7 @@ splashJS.init = async function () {
 		}
 
 		document.body.classList.add("ready");
+		mmm("✅ splashJS initialized");
 		return true;
 	} catch (err) {
 		console.error("❌ splashJS.init() failed:", err);
