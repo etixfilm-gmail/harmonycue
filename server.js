@@ -74,8 +74,10 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const HOSTNAME = "23.235.221.126";
+const HOSTNAME = process.env.HOST || "0.0.0.0";
+// const HOSTNAME = "23.235.221.126"; Old InmotionHosing IP
 
 app.listen(PORT, HOSTNAME, () => {
-	console.log(`Express server listening at http://${HOSTNAME}:${PORT}`);
+	const displayHost = HOSTNAME === "0.0.0.0" ? "localhost" : HOSTNAME;
+	console.log(`Express server listening at http://${displayHost}:${PORT}`);
 });

@@ -6,6 +6,7 @@
 	"scripts": {
 		"start": "node server.js",
 		"dev": "nodemon --ignore feedback.json server.js",
+		"dev:watch": "concurrently \"nodemon server.js\" \"browser-sync start --proxy localhost:3000 --files 'public/**/*'\"",
 		"restart": "bash -c 'pkill -f \"node.*server.js\" || true && sleep 1 && node server.js'",
 		"stop": "pkill -f 'node.*server.js'"
 	},
@@ -27,11 +28,13 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.33.0",
+		"browser-sync": "^3.0.4",
+		"concurrently": "^9.2.1",
 		"eslint": "^9.33.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-prettier": "^5.2.3",
 		"globals": "^15.15.0",
-		"nodemon": "^3.1.9",
+		"nodemon": "^3.1.10",
 		"prettier": "^3.4.2"
 	}
 }
