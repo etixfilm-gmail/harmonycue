@@ -293,6 +293,7 @@ somenamespaceJS.fnName = function (event) {
   const flags = somenamespaceJS.hoverListenerFlags;
 
   // Register this event in the global registry
+  // eRegistryJS.register() generates and returns a faux event object with a unique passkey
   event = eRegistryJS.register(event);
 
   // Track which method is using this event
@@ -304,6 +305,16 @@ somenamespaceJS.fnName = function (event) {
   // ... actual event handler logic ...
 };
 ```
+
+**Event Registry and Faux Events:**
+`eRegistryJS.register()` generates and returns a **faux event object** that contains a unique passkey. This faux event can be passed to other methods as if it were a real browser event. Key features:
+
+- **Unique passkey:** Each faux event has a unique identifier for tracking
+- **Duplicate prevention:** The passkey system guards against duplicate event processing
+- **Interchangeable:** Both `eRegistryJS.register()` and `eRegistryJS.use()` accept either real browser events or faux events as arguments
+- **Method chaining:** Faux events can be passed between methods to maintain event tracking context
+
+This allows events to be tracked through multiple method calls and prevents the same event from being processed multiple times.
 
 **Why This Pattern:**
 - **Centralized tracking:** All events flow through the registry for debugging
