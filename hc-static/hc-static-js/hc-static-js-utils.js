@@ -108,7 +108,6 @@ utilsJS.addListener = function (eventArgs) {
 		eventType,
 		fnCall,
 		listenerFlags, // Object containing the flag
-		flagKey, // Property name of the flag
 	} = eventArgs;
 
 	// Validation
@@ -118,7 +117,7 @@ utilsJS.addListener = function (eventArgs) {
 	}
 
 	// Check if listener already exists
-	if (listenerFlags && flagKey && listenerFlags[flagKey]) {
+	if (listenerFlags && eventType && listenerFlags[eventType]) {
 		// c•onsole.log(`⚠️ ${eventType} listener already exists on ${DOMElement.id}`);
 		return false;
 	}
@@ -128,8 +127,8 @@ utilsJS.addListener = function (eventArgs) {
 		DOMElement.addEventListener(eventType, fnCall);
 
 		// Update the flag in the original object
-		if (!!listenerFlags && !!flagKey) {
-			listenerFlags[flagKey] = true;
+		if (!!listenerFlags && !!eventType) {
+			listenerFlags[eventType] = true;
 		}
 
 		// c•onsole.log(`✅ Added ${eventType} listener to ${DOMElement.id}`);
@@ -147,7 +146,6 @@ utilsJS.removeListener = function (eventArgs) {
 		eventType,
 		fnCall,
 		listenerFlags, // Object containing the flag
-		flagKey, // Property name of the flag
 	} = eventArgs;
 
 	// Validation
@@ -157,18 +155,18 @@ utilsJS.removeListener = function (eventArgs) {
 	}
 
 	// Check if listener already exists
-	if (listenerFlags && flagKey && !listenerFlags[flagKey]) {
+	if (listenerFlags && eventType && !listenerFlags[eventType]) {
 		// c•onsole.log(`⚠️ ${eventType} listener already removed from ${DOMElement.id}`);
 		return false;
 	}
 
 	try {
 		// Remove the event listener
-		DOMElement.removeEventListener(`eventType`, fnCall);
+		DOMElement.removeEventListener(eventType, fnCall);
 
 		// Update the flag in the original object
-		if (!!listenerFlags && !!flagKey) {
-			listenerFlags[flagKey] = false;
+		if (!!listenerFlags && !!eventType) {
+			listenerFlags[eventType] = false;
 		}
 
 		// c•onsole.log(`✅ Removed ${eventType} listener from ${DOMElement.id}`);

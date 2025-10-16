@@ -131,28 +131,24 @@ lockJS.initListenerObjects = function () {
 			eventType: "pointerup",
 			fnCall: lockJS.onUpEventTest,
 			listenerFlags: flags,
-			flagKey: "pointerup",
 		},
 		pointerdown: {
 			DOMElement: overlay,
 			eventType: "pointerdown",
 			fnCall: lockJS.onDownEventTest,
 			listenerFlags: flags,
-			flagKey: "pointerdown",
 		},
 		pointercancel: {
 			DOMElement: overlay,
 			eventType: "pointercancel",
 			fnCall: lockJS.onCancelEventTest,
 			listenerFlags: flags,
-			flagKey: "pointercancel",
 		},
 		keydown: {
 			DOMElement: overlay,
 			eventType: "keydown",
 			fnCall: lockJS.onKeydownEventTest,
 			listenerFlags: flags,
-			flagKey: "keydown",
 		},
 	};
 	const listeners = lockJS.overlayListenerObjects;

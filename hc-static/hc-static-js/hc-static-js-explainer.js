@@ -171,42 +171,36 @@ explainerJS.initListenerObjects = function () {
 			eventType: "audiounlock",
 			fnCall: explainerJS.onUnlockTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "audiounlock",
 		},
 		pointerup: {
 			DOMElement: hoverArea,
 			eventType: "pointerup",
 			fnCall: explainerJS.onUpEventTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "pointerup",
 		},
 		pointerdown: {
 			DOMElement: hoverArea,
 			eventType: "pointerdown",
 			fnCall: explainerJS.onDownEventTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "pointerdown",
 		},
 		pointerenter: {
 			DOMElement: hoverArea,
 			eventType: "pointerenter",
 			fnCall: explainerJS.onEnterEventTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "pointerenter",
 		},
 		pointerleave: {
 			DOMElement: hoverArea,
 			eventType: "pointerleave",
 			fnCall: explainerJS.onLeaveEventTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "pointerleave",
 		},
 		pointermove: {
 			DOMElement: hoverArea,
 			eventType: "pointermove",
 			fnCall: explainerJS.onMoveEventTest,
 			listenerFlags: explainerJS.hoverListenerFlags,
-			flagKey: "pointermove",
 		},
 	};
 };
